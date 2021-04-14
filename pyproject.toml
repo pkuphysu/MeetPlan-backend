@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "MeetPlan-backend"
+version = "0.1.0"
+description = "Python Backend of Meet Plan for the shool of Physics"
+authors = ["Rainshaw <rxg@live.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+Django = "^3.2"
+graphene-django = "^3.0.0b1"
+django-filter = "^2.4.0"
+django-graphql-jwt = "^0.3.2"
+requests = "^2.25.1"
+django-guardian = "^2.3.0"
+graphene-django-optimizer = "^0.8.0"
+graphene-django-plus = "^2.3.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^6.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
