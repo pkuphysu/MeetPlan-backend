@@ -5,8 +5,10 @@ import graphene
 import graphql_jwt
 from django.contrib.auth import authenticate
 from django.utils.translation import gettext as _
+from graphene import relay
 from graphene.utils.thenables import maybe_thenable
-from graphene_django import DjangoObjectType
+from graphene_django_plus.fields import CountableConnection
+from graphene_django_plus.types import ModelType
 from graphql_jwt import exceptions, signals
 from graphql_jwt.decorators import setup_jwt_cookie, csrf_rotation, refresh_expiration, on_token_auth_resolve
 from graphql_jwt.mixins import ObtainJSONWebTokenMixin
@@ -66,14 +68,26 @@ class ObtainJSONWebToken(ObtainJSONWebTokenMixin, graphene.Mutation):
         return cls.resolve(root, info, **kwargs)
 
 
-class OpenIDClientType(DjangoObjectType):
+class AbstractMeta:
     class Meta:
+        abstract = True
+
+    interfaces = (relay.Node,)
+    connection_class = CountableConnection
+    allow_unauthenticated = False
+    object_permissions = []
+    permissions = []
+
+
+class OpenIDClientType(ModelType):
+    class Meta(AbstractMeta):
         model = OpenIDClient
         fields = [
             'client_id',
             'redirect_uri',
             'scopes'
         ]
+        allow_unauthenticated = True
 
 
 class Query(graphene.ObjectType):
