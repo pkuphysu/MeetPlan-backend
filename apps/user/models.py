@@ -25,14 +25,14 @@ class User(AbstractUser, GuardianUserMixin):
     first_name = None
     last_name = None
     username = None
-    username_validator = PKUIDValidator()
+    pku_id_validator = PKUIDValidator()
 
     pku_id = models.CharField(
         _('pku id'),
         max_length=10,
         unique=True,
         help_text=_('Required. It\'s your pku id. 10 characters. Digits only.'),
-        validators=[username_validator],
+        validators=[pku_id_validator],
         error_messages={
             'unique': _("A user with that id already exists."),
         },
