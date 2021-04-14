@@ -9,4 +9,4 @@ class OpenIDClientAdmin(admin.ModelAdmin):
         'client_id',
         'scopes'
     ]
-    ordering = '-id'
+    ordering = ['-id']
