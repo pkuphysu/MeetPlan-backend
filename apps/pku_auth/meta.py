@@ -8,6 +8,13 @@ class AbstractMeta:
 
     **Extra options**
 
+    ``AbstractMeta.convert_choices_to_enum``
+
+        *Default*: ``[]``
+
+        Disable the automatic conversion on any Django fields that have
+        choices defined into a GraphQL enum type.
+
     ``AbstractMeta.interfaces``
 
         *Default*: ``(graphene.relay.Node)``
@@ -50,6 +57,7 @@ class AbstractMeta:
     class Meta:
         abstract = True
 
+    convert_choices_to_enum = []
     interfaces = (relay.Node,)
     connection_class = CountableConnection
     allow_unauthenticated = False
