@@ -60,7 +60,7 @@ class User(AbstractUser, GuardianUserMixin):
     )
     is_teacher = models.BooleanField(
         _('is teacher'),
-        # choices=((False, _('student')), (True, _('teacher'))),
+        choices=((False, _('student')), (True, _('teacher'))),
         default=False,
         help_text=_(
             'Designates whether the user is a teacher.'
@@ -90,7 +90,7 @@ class User(AbstractUser, GuardianUserMixin):
     USERNAME_FIELD = 'pku_id'
 
     class Meta(AbstractUser.Meta):
-        pass
+        abstract = False
 
     def get_full_name(self):
         return self.name
