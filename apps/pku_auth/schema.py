@@ -94,15 +94,15 @@ class Query(graphene.ObjectType):
     from .meta import FieldWithDocs
     openid_client = FieldWithDocs(OpenIDClientType)
 
-    # @staticmethod
-    # def resolve_openid_client(root, info):
-    #     """
-    #     TODO: when https://github.com/tfoxy/graphene-django-optimizer release support graphene v3
-    #     try this
-    #     import graphene_django_optimizer as gql_optimizer
-    #     return gql_optimizer.query(OpenIDClient.objects.last(), info)
-    #     """
-    #     return OpenIDClient.objects.last()
+    @staticmethod
+    def resolve_openid_client(root, info):
+        """
+        TODO: when https://github.com/tfoxy/graphene-django-optimizer release support graphene v3
+        try this
+        import graphene_django_optimizer as gql_optimizer
+        return gql_optimizer.query(OpenIDClient.objects.last(), info)
+        """
+        return OpenIDClient.objects.last()
 
 
 class Verify(graphql_jwt.Verify):
