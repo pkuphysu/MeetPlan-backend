@@ -1,3 +1,4 @@
+import graphene
 from graphene import relay
 from graphene_django_plus.fields import CountableConnection
 
@@ -63,3 +64,9 @@ class AbstractMeta:
     allow_unauthenticated = False
     object_permissions = []
     permissions = []
+
+
+class FieldWithDocs(graphene.Field):
+    def __init__(self, type_, description=None, **extra_args):
+        super().__init__(type_, description=description or type_._meta.description, **extra_args)
+

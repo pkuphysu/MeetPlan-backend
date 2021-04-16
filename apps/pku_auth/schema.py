@@ -48,6 +48,12 @@ def token_auth(f):
 
 
 class ObtainJSONWebToken(ObtainJSONWebTokenMixin, graphene.Mutation):
+    """
+    Use this for login user in.\n
+    Then add a option in http header:\n
+    \tAuthorization: JWT <token> \n
+    payload include user.ID & token expire timestamp
+    """
     user = graphene.Field(apps.user.schema.UserType)
 
     @classmethod
@@ -68,9 +74,15 @@ class ObtainJSONWebToken(ObtainJSONWebTokenMixin, graphene.Mutation):
 
 
 class OpenIDClientType(ModelType):
+    """
+    Offer enough information for frontend to build redirect auth url.\n
+    \thttps://{authorization_endpoint}?response_type=code&client_id={clientId}&scope={scopes}&redirect_uri={redirectUri}[&state={some character}]
+    """
+
     class Meta(AbstractMeta):
         model = OpenIDClient
         fields = [
+            'authorization_endpoint',
             'client_id',
             'redirect_uri',
             'scopes'
@@ -79,13 +91,43 @@ class OpenIDClientType(ModelType):
 
 
 class Query(graphene.ObjectType):
-    openid_client = graphene.Field(OpenIDClientType)
+    from .meta import FieldWithDocs
+    openid_client = FieldWithDocs(OpenIDClientType)
 
-    def resolve_openid_client(root, info):
-        return OpenIDClient.objects.last()
+    # @staticmethod
+    # def resolve_openid_client(root, info):
+    #     """
+    #     TODO: when https://github.com/tfoxy/graphene-django-optimizer release support graphene v3
+    #     try this
+    #     import graphene_django_optimizer as gql_optimizer
+    #     return gql_optimizer.query(OpenIDClient.objects.last(), info)
+    #     """
+    #     return OpenIDClient.objects.last()
+
+
+class Verify(graphql_jwt.Verify):
+    """
+    Use this to get payload from token.\n
+    """
+
+
+class Refresh(graphql_jwt.Refresh):
+    """
+    Use this to get new token with refreshToken.
+    """
+
+
+class Revoke(graphql_jwt.Revoke):
+    """
+    Use this to revoke fresh token.
+    """
 
 
 class RevokeAll(graphene.Mutation):
+    """
+    Use this to revoke all fresh tokens issued to the user.
+    """
+
     class Arguments:
         refresh_token = graphene.String()
 
@@ -107,8 +149,8 @@ class RevokeAll(graphene.Mutation):
 
 
 class Mutation(graphene.ObjectType):
-    token_auth = ObtainJSONWebToken.Field()
-    verify_token = graphql_jwt.Verify.Field()
-    refresh_token = graphql_jwt.Refresh.Field()
-    revoke_token = graphql_jwt.Revoke.Field()
+    code_auth = ObtainJSONWebToken.Field()
+    verify_token = Verify.Field()
+    refresh_token = Refresh.Field()
+    revoke_token = Revoke.Field()
     revoke_token_all = RevokeAll.Field()
