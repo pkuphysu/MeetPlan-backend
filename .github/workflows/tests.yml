@@ -23,11 +23,9 @@ jobs:
         uses: abatilo/actions-poetry@v2.1.0
         with:
           poetry-version: 1.1.5
-
-      # Runs a single command using the runners shell
       - name: Install Dependences
         run: poetry install
-
-      # Runs a set of commands using the runners shell
+      - run: poetry run python manage.py makemigrations
+      - run: poetry run python manage.py migrate
       - name: Run test
         run: poetry run python manage.py test
