@@ -39,7 +39,7 @@ class UserType(ModelType):
             'department',
             'introduce',
             'is_admin',
-            'is_active',
+            # 'is_active',
             # 'date_joined',
             # 'last_login',
         ]
@@ -55,30 +55,47 @@ class UserType(ModelType):
         allow_unauthenticated = True
         convert_choices_to_enum = []
 
-    pku_id = graphene.String(description=_("Note: only user himself or teacher could query this field."))
+    pku_id = graphene.String(description=_("Only allow user query himself or teacher query student on this field."))
 
-    def resolve_pku_id(self, info):
+    @staticmethod
+    def resolve_pku_id(parent, info):
+        if info.context.user.is_admin:
+            return parent.pku_id
         if info.context.user.is_teacher:
-            if not self.is_teacher:
-                return self.pku_id
-        if info.context.user.id == self.id:
-            return self.pku_id
+            if not parent.is_teacher:
+                return parent.pku_id
+        if info.context.user.id == parent.id:
+            return parent.pku_id
         raise PermissionDenied
 
-    date_joined = graphene.DateTime(description='Note: only user himself could query this field.')
+    is_active = graphene.Boolean(description=_("Only allow user query himself on this field."))
+
+    @staticmethod
+    def resolve_is_active(parent, info):
+        if info.context.user.is_admin:
+            return parent.is_active
+        if info.context.user.id == parent.id:
+            return parent.is_active
+        raise PermissionDenied
+
+    date_joined = graphene.DateTime(description=_('Only allow user query himself on this field.'))
 
     @staticmethod
     def resolve_date_joined(parent, info):
-        print(parent.__dict__)
+        if info.context.user.is_admin:
+            return parent.date_joined
         if info.context.user.id == parent.id:
             return parent.date_joined
         raise PermissionDenied
 
-    last_login = graphene.DateTime(description='Note: only user himself could query this field.')
+    last_login = graphene.DateTime(description=_('Only allow user query himself on this field.'))
 
-    def resolve_last_login(self, info):
-        if info.context.user.id == self.id:
-            return self.last_login
+    @staticmethod
+    def resolve_last_login(parent, info):
+        if info.context.user.is_admin:
+            return parent.last_login
+        if info.context.user.id == parent.id:
+            return parent.last_login
         raise PermissionDenied
 
     @classmethod
@@ -101,7 +118,7 @@ class Query(graphene.ObjectType):
     departments = DjangoFilterConnectionField(DepartmentType)
 
     user = relay.Node.Field(UserType)
-    all_users = DjangoFilterConnectionField(UserType)
+    users = DjangoFilterConnectionField(UserType)
 
 
 class Mutation(graphene.ObjectType):
