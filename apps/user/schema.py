@@ -49,11 +49,7 @@ class UserType(ModelType):
         allow_unauthenticated = True
         convert_choices_to_enum = []
 
-    pku_id = graphene.String(
-        description=_(
-            "Only allow user query himself or teacher query student on this field."
-        )
-    )
+    pku_id = graphene.String(description=_("Only allow user query himself or teacher query student on this field."))
 
     @staticmethod
     def resolve_pku_id(parent, info):
@@ -66,9 +62,7 @@ class UserType(ModelType):
             return parent.pku_id
         raise PermissionDenied
 
-    is_active = graphene.Boolean(
-        description=_("Only allow user query himself on this field.")
-    )
+    is_active = graphene.Boolean(description=_("Only allow user query himself on this field."))
 
     @staticmethod
     def resolve_is_active(parent, info):
@@ -78,9 +72,7 @@ class UserType(ModelType):
             return parent.is_active
         raise PermissionDenied
 
-    date_joined = graphene.DateTime(
-        description=_("Only allow user query himself on this field.")
-    )
+    date_joined = graphene.DateTime(description=_("Only allow user query himself on this field."))
 
     @staticmethod
     def resolve_date_joined(parent, info):
@@ -90,9 +82,7 @@ class UserType(ModelType):
             return parent.date_joined
         raise PermissionDenied
 
-    last_login = graphene.DateTime(
-        description=_("Only allow user query himself on this field.")
-    )
+    last_login = graphene.DateTime(description=_("Only allow user query himself on this field."))
 
     @staticmethod
     def resolve_last_login(parent, info):

@@ -31,4 +31,4 @@ jobs:
       - name: Lint
         run: |
           poetry run flake8 --count --show-source --statistics apps MeetPlan manage.py
-          poetry run black --check -l 100 --exclude "/migrations/" apps MeetPlan
+          poetry run black --check -l 120 --exclude "/migrations/" apps MeetPlan

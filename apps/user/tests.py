@@ -252,9 +252,7 @@ class ApiTest(GraphQLTestCase):
                 user_set = user_set["edges"]
                 for node2 in user_set:
                     user2 = node2["node"]
-                    self.assertEqual(
-                        user2["department"]["department"], department.department
-                    )
+                    self.assertEqual(user2["department"]["department"], department.department)
 
     def test_departments_with_token_on_pkuId_field(self):
         # student query user in 'student' department

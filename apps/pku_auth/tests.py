@@ -275,11 +275,7 @@ class ApiTestWithJWT(GraphQLTestCase):
 
     def test_verify_token_expired(self):
         token = get_token(self.user)
-        with freeze_time(
-            lambda: datetime.utcnow()
-            + jwt_settings.JWT_EXPIRATION_DELTA
-            + timedelta(seconds=1)
-        ):
+        with freeze_time(lambda: datetime.utcnow() + jwt_settings.JWT_EXPIRATION_DELTA + timedelta(seconds=1)):
             response = self.query(
                 """
                 mutation myMutation($token: String!) {

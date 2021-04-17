@@ -24,9 +24,7 @@ class OpenIDClientBackend:
 
     @staticmethod
     def get_userinfo(client, token):
-        res = requests.get(
-            client.userinfo_endpoint, headers={"Authorization": f"Bearer {token}"}
-        )
+        res = requests.get(client.userinfo_endpoint, headers={"Authorization": f"Bearer {token}"})
         return res.json()
 
     def authenticate(self, request, code, **kwargs):
@@ -36,22 +34,14 @@ class OpenIDClientBackend:
         if not userinfo["is_pku"]:
             return None
 
-        user, created1 = get_user_model().objects.get_or_create(
-            pku_id=userinfo["pku_id"]
-        )
+        user, created1 = get_user_model().objects.get_or_create(pku_id=userinfo["pku_id"])
         if created1:
             user.name = userinfo["name"] if "name" in userinfo else ""
             user.email = userinfo["email"] if "email" in userinfo else ""
             user.website = userinfo["website"] if "website" in userinfo else ""
-            user.phone_number = (
-                userinfo["phone_number"] if "phone_number" in userinfo else ""
-            )
-            user.address = (
-                userinfo["address"]["formatted"] if "address" in userinfo else ""
-            )
-            user.is_teacher = (
-                userinfo["is_teacher"] if "is_teacher" in userinfo else False
-            )
+            user.phone_number = userinfo["phone_number"] if "phone_number" in userinfo else ""
+            user.address = userinfo["address"]["formatted"] if "address" in userinfo else ""
+            user.is_teacher = userinfo["is_teacher"] if "is_teacher" in userinfo else False
             user.introduce = userinfo["introduce"] if "introduce" in userinfo else ""
             user.save(
                 update_fields=[
@@ -66,9 +56,7 @@ class OpenIDClientBackend:
             )
             user_create.send(sender=self.__class__, user=user)
         if "department" in userinfo:
-            department, created2 = Department.objects.get_or_create(
-                department=userinfo["department"]
-            )
+            department, created2 = Department.objects.get_or_create(department=userinfo["department"])
             if created1:
                 user.department = department
                 user.save(update_fields=["department"])

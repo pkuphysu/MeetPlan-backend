@@ -8,6 +8,4 @@ class UserConfig(AppConfig):
     name = "apps.user"
 
     def ready(self):
-        user_create.connect(
-            receiver=user_create_callback, dispatch_uid="openid_auth_create_user"
-        )
+        user_create.connect(receiver=user_create_callback, dispatch_uid="openid_auth_create_user")

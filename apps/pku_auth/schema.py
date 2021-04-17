@@ -144,9 +144,7 @@ class RevokeAll(graphene.Mutation):
     def revoke(cls, root, info, refresh_token, **kwargs):
         context = info.context
         refresh_token_obj = get_refresh_token(refresh_token, context)
-        refresh_token_objs = get_refresh_token_model().objects.filter(
-            user=refresh_token_obj.user
-        )
+        refresh_token_objs = get_refresh_token_model().objects.filter(user=refresh_token_obj.user)
         for refresh_token_obj in refresh_token_objs:
             refresh_token_obj.revoke(context)
         return cls(revoked=timegm(refresh_token_obj.revoked.timetuple()))

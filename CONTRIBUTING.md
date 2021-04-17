@@ -42,7 +42,7 @@ This will trigger a series of test and lint checks.
 We advise that you format and run lint locally before doing this to save time:
 
 ```sh
-black --exclude "/migrations/" apps MeetPlan
+black -l 120 --exclude "/migrations/" apps MeetPlan
 flake8 apps MeetPlan manage.py
 ```
 
