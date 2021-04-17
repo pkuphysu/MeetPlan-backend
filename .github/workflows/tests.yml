@@ -1,13 +1,9 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: TEST
 
 # Controls when the action will run. 
-on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-  push:
-  pull_request:
-  workflow_dispatch:
+on: [push, pull_request]
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -15,17 +11,23 @@ jobs:
     name: Run Test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v2
         with:
           python-version: 3.9
-      - name: Python Poetry Action
+      - name: Install Poetry
         uses: abatilo/actions-poetry@v2.1.0
         with:
           poetry-version: 1.1.5
       - name: Install Dependences
         run: poetry install
-      - run: poetry run python manage.py makemigrations
-      - run: poetry run python manage.py migrate
+      - name: Run migrate
+        run: |
+          poetry run python manage.py makemigrations
+          poetry run python manage.py migrate
+      - name: Run compilemessages
+        run: poetry run python manage.py compilemessages
       - name: Run test
         run: poetry run python manage.py test
