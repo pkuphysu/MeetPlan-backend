@@ -11,15 +11,15 @@ class Query(
     # apps.meet_plan.schema.Query,
     apps.user.schema.Query,
     apps.pku_auth.schema.Query,
-    graphene.ObjectType):
+    graphene.ObjectType,
+):
     if settings.DEBUG:
-        debug = graphene.Field(DjangoDebug, name='_debug')
+        debug = graphene.Field(DjangoDebug, name="_debug")
 
 
 class Mutation(  # apps.meet_plan.schema.Mutation,
-    apps.user.schema.Mutation,
-    apps.pku_auth.schema.Mutation,
-    graphene.ObjectType):
+    apps.user.schema.Mutation, apps.pku_auth.schema.Mutation, graphene.ObjectType
+):
     pass
 
 

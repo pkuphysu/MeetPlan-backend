@@ -11,16 +11,10 @@ from apps.user.models import User, Department
 
 class DepartmentType(ModelType):
     class Meta(AbstractMeta):
-        description = _('123')
+        description = _("123")
         model = Department
-        fields = [
-            'id',
-            'department',
-            'user_set'
-        ]
-        filter_fields = {
-            'department': ['icontains']
-        }
+        fields = ["id", "department", "user_set"]
+        filter_fields = {"department": ["icontains"]}
         allow_unauthenticated = True
 
 
@@ -28,34 +22,38 @@ class UserType(ModelType):
     class Meta(AbstractMeta):
         model = User
         fields = [
-            'id',
+            "id",
             # 'pku_id',
-            'name',
-            'email',
-            'website',
-            'phone_number',
-            'address',
-            'is_teacher',
-            'department',
-            'introduce',
-            'is_admin',
+            "name",
+            "email",
+            "website",
+            "phone_number",
+            "address",
+            "is_teacher",
+            "department",
+            "introduce",
+            "is_admin",
             # 'is_active',
             # 'date_joined',
             # 'last_login',
         ]
         filter_fields = [
-            'id',
-            'pku_id',
-            'name',
-            'department__department',
-            'is_teacher',
-            'is_admin',
-            'is_active',
+            "id",
+            "pku_id",
+            "name",
+            "department__department",
+            "is_teacher",
+            "is_admin",
+            "is_active",
         ]
         allow_unauthenticated = True
         convert_choices_to_enum = []
 
-    pku_id = graphene.String(description=_("Only allow user query himself or teacher query student on this field."))
+    pku_id = graphene.String(
+        description=_(
+            "Only allow user query himself or teacher query student on this field."
+        )
+    )
 
     @staticmethod
     def resolve_pku_id(parent, info):
@@ -68,7 +66,9 @@ class UserType(ModelType):
             return parent.pku_id
         raise PermissionDenied
 
-    is_active = graphene.Boolean(description=_("Only allow user query himself on this field."))
+    is_active = graphene.Boolean(
+        description=_("Only allow user query himself on this field.")
+    )
 
     @staticmethod
     def resolve_is_active(parent, info):
@@ -78,7 +78,9 @@ class UserType(ModelType):
             return parent.is_active
         raise PermissionDenied
 
-    date_joined = graphene.DateTime(description=_('Only allow user query himself on this field.'))
+    date_joined = graphene.DateTime(
+        description=_("Only allow user query himself on this field.")
+    )
 
     @staticmethod
     def resolve_date_joined(parent, info):
@@ -88,7 +90,9 @@ class UserType(ModelType):
             return parent.date_joined
         raise PermissionDenied
 
-    last_login = graphene.DateTime(description=_('Only allow user query himself on this field.'))
+    last_login = graphene.DateTime(
+        description=_("Only allow user query himself on this field.")
+    )
 
     @staticmethod
     def resolve_last_login(parent, info):

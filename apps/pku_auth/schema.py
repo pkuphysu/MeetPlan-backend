@@ -8,7 +8,12 @@ from django.utils.translation import gettext as _
 from graphene.utils.thenables import maybe_thenable
 from graphene_django_plus.types import ModelType
 from graphql_jwt import exceptions, signals
-from graphql_jwt.decorators import setup_jwt_cookie, csrf_rotation, refresh_expiration, on_token_auth_resolve
+from graphql_jwt.decorators import (
+    setup_jwt_cookie,
+    csrf_rotation,
+    refresh_expiration,
+    on_token_auth_resolve,
+)
 from graphql_jwt.mixins import ObtainJSONWebTokenMixin
 from graphql_jwt.refresh_token.decorators import ensure_refresh_token
 from graphql_jwt.refresh_token.shortcuts import get_refresh_token
@@ -34,10 +39,10 @@ def token_auth(f):
         )
         if user is None:
             raise exceptions.JSONWebTokenError(
-                _('Please enter valid credentials'),
+                _("Please enter valid credentials"),
             )
 
-        if hasattr(context, 'user'):
+        if hasattr(context, "user"):
             context.user = user
 
         result = f(cls, root, info, **kwargs)
@@ -55,6 +60,7 @@ class ObtainJSONWebToken(ObtainJSONWebTokenMixin, graphene.Mutation):
     \tAuthorization: JWT <token> \n
     payload include user.ID & token expire timestamp
     """
+
     user = graphene.Field(apps.user.schema.UserType)
 
     @classmethod
@@ -63,9 +69,11 @@ class ObtainJSONWebToken(ObtainJSONWebTokenMixin, graphene.Mutation):
 
     @classmethod
     def Field(cls, *args, **kwargs):
-        cls._meta.arguments.update({
-            'code': graphene.String(required=True),
-        })
+        cls._meta.arguments.update(
+            {
+                "code": graphene.String(required=True),
+            }
+        )
         return super().Field(*args, **kwargs)
 
     @classmethod
@@ -77,22 +85,19 @@ class ObtainJSONWebToken(ObtainJSONWebTokenMixin, graphene.Mutation):
 class OpenIDClientType(ModelType):
     """
     Offer enough information for frontend to build redirect auth url.\n
-    \thttps://{authorization_endpoint}?response_type=code&client_id={clientId}&scope={scopes}&redirect_uri={redirectUri}[&state={some character}]
+    ``https://{authorization_endpoint}?response_type=code&client_id={clientId}
+    &scope={scopes}&redirect_uri={redirectUri}[&state={some character}]``
     """
 
     class Meta(AbstractMeta):
         model = OpenIDClient
-        fields = [
-            'authorization_endpoint',
-            'client_id',
-            'redirect_uri',
-            'scopes'
-        ]
+        fields = ["authorization_endpoint", "client_id", "redirect_uri", "scopes"]
         allow_unauthenticated = True
 
 
 class Query(graphene.ObjectType):
     from .meta import FieldWithDocs
+
     openid_client = FieldWithDocs(OpenIDClientType)
 
     @staticmethod
@@ -139,7 +144,9 @@ class RevokeAll(graphene.Mutation):
     def revoke(cls, root, info, refresh_token, **kwargs):
         context = info.context
         refresh_token_obj = get_refresh_token(refresh_token, context)
-        refresh_token_objs = get_refresh_token_model().objects.filter(user=refresh_token_obj.user)
+        refresh_token_objs = get_refresh_token_model().objects.filter(
+            user=refresh_token_obj.user
+        )
         for refresh_token_obj in refresh_token_objs:
             refresh_token_obj.revoke(context)
         return cls(revoked=timegm(refresh_token_obj.revoked.timetuple()))

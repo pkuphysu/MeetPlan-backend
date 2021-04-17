@@ -55,6 +55,7 @@ class AbstractMeta:
         This is empty by default.
 
     """
+
     class Meta:
         abstract = True
 
@@ -68,5 +69,6 @@ class AbstractMeta:
 
 class FieldWithDocs(graphene.Field):
     def __init__(self, type_, description=None, **extra_args):
-        super().__init__(type_, description=description or type_._meta.description, **extra_args)
-
+        super().__init__(
+            type_, description=description or type_._meta.description, **extra_args
+        )
