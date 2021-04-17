@@ -1,6 +1,10 @@
 # 北京大学物理学院本科生综合指导课
+[TOC]
 
-## 如何部署
+## 开发指南
+见 [CONTRIBUTING](CODE_OF_CONDUCT.md)
+
+## 部署
 
 ### 安装 [poetry](https://github.com/python-poetry/poetry) 并安装项目依赖
 
@@ -42,18 +46,6 @@ poetry run python manage.py migrate
 
 ```shell
 poetry run python manage.py compilemessages
-```
-
-### 本地测试
-
-```shell
-# 单纯地跑测试
-poetry run pytest
-# 记录测试覆盖率
-poetry run task test-cov
-poetry run task cov-report
-# 代码检查
-poetry run task flake8 bookB116
 ```
 
 #### 前端
