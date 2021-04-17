@@ -1,8 +1,7 @@
 # 北京大学物理学院本科生综合指导课
-[TOC]
 
 ## 开发指南
-见 [CONTRIBUTING](CODE_OF_CONDUCT.md)
+见 [CONTRIBUTING](CONTRIBUTING.md)
 
 ## 部署
 
