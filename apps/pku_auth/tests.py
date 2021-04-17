@@ -110,15 +110,24 @@ class BackendTest(TestCase):
                 self.assertEqual(user.department, Department.objects.get(department='some-department2'))
 
 
-class SignalTest(TestCase):
+class TestBackend(OpenIDClientBackend):
+    def authenticate(self, request, code, **kwargs):
+        return User.objects.get(pku_id=code)
+
+
+class SignalTest(GraphQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.user = User.objects.create(pku_id='2000000000')
+
     @mock.patch('apps.pku_auth.signals.user_create.send')
-    def test_question_posted_signal_triggered(self, signal):
+    def test_user_create_signal_triggered(self, signal):
         backend = OpenIDClientBackend()
         get_token = mock.Mock(return_value='123')
         userinfo = mock.Mock(
             return_value={
                 'is_pku': True,
-                'pku_id': '2000000000',
+                'pku_id': '2000000001',
                 'department': 'some-department2'
             })
         with mock.patch.object(backend, 'get_token', get_token):
@@ -127,10 +136,26 @@ class SignalTest(TestCase):
         self.assertTrue(signal.called)
         self.assertEqual(signal.call_count, 1)
 
-
-class TestBackend(OpenIDClientBackend):
-    def authenticate(self, request, code, **kwargs):
-        return User.objects.get(pku_id=code)
+    @override_settings(AUTHENTICATION_BACKENDS=['apps.pku_auth.tests.TestBackend'])
+    def test_user_logged_in_signal_triggered(self):
+        response = self.query(
+            '''
+            mutation myMutation($input: String!) {
+              codeAuth(code: $input) {
+                token
+                user {
+                  lastLogin
+                }
+                refreshToken
+              }
+            }
+            ''',
+            operation_name='myMutation',
+            variables={'input': '2000000000'}
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertIsNotNone(content['data']['codeAuth']['user']['lastLogin'])
 
 
 class ApiTest(GraphQLTestCase):

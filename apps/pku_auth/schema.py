@@ -3,7 +3,7 @@ from functools import wraps
 
 import graphene
 import graphql_jwt
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, user_logged_in
 from django.utils.translation import gettext as _
 from graphene.utils.thenables import maybe_thenable
 from graphene_django_plus.types import ModelType
@@ -42,6 +42,7 @@ def token_auth(f):
 
         result = f(cls, root, info, **kwargs)
         signals.token_issued.send(sender=cls, request=context, user=user)
+        user_logged_in.send(sender=cls, user=user)
         return maybe_thenable((context, user, result), on_token_auth_resolve)
 
     return wrapper
