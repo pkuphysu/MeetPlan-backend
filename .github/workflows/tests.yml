@@ -1,14 +1,13 @@
-# This is a basic workflow to help you get started with Actions
-
-name: TEST
-
-# Controls when the action will run. 
-on: [push, pull_request]
-
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+name: Run Tests
+on:
+  push:
+    paths-ignore:
+      - translation/*
+  pull_request:
+    paths-ignore:
+      - translation/*
 jobs:
   test:
-    name: Run Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -29,3 +28,5 @@ jobs:
           poetry run python manage.py migrate
       - name: Run test
         run: poetry run python manage.py test
+      - name: Lint
+        run: poetry run flake8 --count --show-source --statistics apps MeetPlan manage.py
