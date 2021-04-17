@@ -1,14 +1,14 @@
 import json
-from datetime import timedelta, datetime
+from datetime import datetime
 from time import sleep
 from unittest import mock
 
 from django.test import TestCase, override_settings
 from freezegun import freeze_time
 from graphene_django.utils.testing import GraphQLTestCase
+from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
 from graphql_jwt.utils import get_payload
-from graphql_jwt.settings import jwt_settings
 
 from apps.pku_auth.backends import OpenIDClientBackend
 from apps.pku_auth.models import OpenIDClient
@@ -108,6 +108,24 @@ class BackendTest(TestCase):
                 self.assertEqual(user.introduce, None)
                 self.assertNotEqual(user.department, self.department)
                 self.assertEqual(user.department, Department.objects.get(department='some-department2'))
+
+
+class SignalTest(TestCase):
+    @mock.patch('apps.pku_auth.signals.user_create.send')
+    def test_question_posted_signal_triggered(self, signal):
+        backend = OpenIDClientBackend()
+        get_token = mock.Mock(return_value='123')
+        userinfo = mock.Mock(
+            return_value={
+                'is_pku': True,
+                'pku_id': '2000000000',
+                'department': 'some-department2'
+            })
+        with mock.patch.object(backend, 'get_token', get_token):
+            with mock.patch.object(backend, 'get_userinfo', userinfo):
+                backend.authenticate(None, '123')
+        self.assertTrue(signal.called)
+        self.assertEqual(signal.call_count, 1)
 
 
 class TestBackend(OpenIDClientBackend):
