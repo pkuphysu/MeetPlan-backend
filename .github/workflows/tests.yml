@@ -29,13 +29,6 @@ jobs:
       - name: Run test
         run: poetry run python manage.py test
       - name: Lint
-        run: poetry run flake8 --count --show-source --statistics apps MeetPlan manage.py
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
-      - uses: psf/black@stable
-        with:
-          args: "--check --exclude \"/migrations/\" apps MeetPlan"
+        run: |
+          poetry run flake8 --count --show-source --statistics apps MeetPlan manage.py
+          poetry run black --check -l 100 --exclude "/migrations/" apps MeetPlan
