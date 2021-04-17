@@ -1,0 +1,171 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-04-18 03:10+0800\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/pku_auth/models.py:6
+msgid "client id"
+msgstr "应用 ID"
+
+#: apps/pku_auth/models.py:7
+msgid "client secret"
+msgstr "应用密钥"
+
+#: apps/pku_auth/models.py:8
+msgid "authorization endpoint"
+msgstr "认证 endpoint"
+
+#: apps/pku_auth/models.py:9
+msgid "token endpoint"
+msgstr "令牌 endpoint"
+
+#: apps/pku_auth/models.py:10
+msgid "userinfo endpoint"
+msgstr "用户信息 endpoint"
+
+#: apps/pku_auth/models.py:11
+msgid "redirect uri"
+msgstr "重定向 uri"
+
+#: apps/pku_auth/models.py:12
+msgid "scopes"
+msgstr "范围"
+
+#: apps/pku_auth/models.py:15
+msgid "OpenID Client"
+msgstr "OpenID 应用"
+
+#: apps/pku_auth/models.py:16
+msgid "OpenID Clients"
+msgstr "OpenID 应用"
+
+#: apps/pku_auth/schema.py:42
+msgid "Please enter valid credentials"
+msgstr "请输入有效的凭证"
+
+#: apps/user/admin.py:38
+msgid "Personal info"
+msgstr "个人信息"
+
+#: apps/user/admin.py:51
+msgid "Permissions"
+msgstr "权限"
+
+#: apps/user/admin.py:65
+msgid "Important dates"
+msgstr "重要日期"
+
+#: apps/user/models.py:10 apps/user/models.py:50
+msgid "department"
+msgstr "部门"
+
+#: apps/user/models.py:13
+msgid "Department"
+msgstr "部门"
+
+#: apps/user/models.py:14
+msgid "Departments"
+msgstr "部门"
+
+#: apps/user/models.py:27
+msgid "pku id"
+msgstr "学/工号"
+
+#: apps/user/models.py:30
+msgid "Required. It's your pku id. 10 characters. Digits only."
+msgstr "必须，这是你的北大学号/工号，为10位数字。"
+
+#: apps/user/models.py:33
+msgid "A user with that id already exists."
+msgstr "具有该学号/工号的用户已存在。"
+
+#: apps/user/models.py:36
+msgid "name"
+msgstr "姓名"
+
+#: apps/user/models.py:37
+msgid "email address"
+msgstr "邮件地址"
+
+#: apps/user/models.py:38
+msgid "website"
+msgstr "网站"
+
+#: apps/user/models.py:39
+msgid "phone number"
+msgstr "电话号码"
+
+#: apps/user/models.py:40
+msgid "address"
+msgstr "地址"
+
+#: apps/user/models.py:42
+msgid "is teacher"
+msgstr "职工状态"
+
+#: apps/user/models.py:43
+msgid "student"
+msgstr "学生"
+
+#: apps/user/models.py:43
+msgid "teacher"
+msgstr "教职工"
+
+#: apps/user/models.py:45
+msgid "Designates whether the user is a teacher."
+msgstr "指明用户是否为老师。"
+
+#: apps/user/models.py:55
+msgid "introduce"
+msgstr "简介"
+
+#: apps/user/models.py:58
+msgid "Your personal introduction."
+msgstr "你的个人简介。"
+
+#: apps/user/models.py:61
+msgid "is admin"
+msgstr "管理员状态"
+
+#: apps/user/models.py:63
+msgid "False"
+msgstr "否"
+
+#: apps/user/models.py:63
+msgid "True"
+msgstr "是"
+
+#: apps/user/models.py:64
+msgid "Admin user can manage this site."
+msgstr "管理员可以管理这个站点。"
+
+#: apps/user/schema.py:14
+msgid "123"
+msgstr ""
+
+#: apps/user/schema.py:52
+msgid "Only allow user query himself or teacher query student on this field."
+msgstr "此字段仅允许用户查询自己或教师查询学生"
+
+#: apps/user/schema.py:65 apps/user/schema.py:75 apps/user/schema.py:85
+msgid "Only allow user query himself on this field."
+msgstr "此字段仅允许用户查询自己。"
+
+#: apps/user/validators.py:9
+msgid "Enter a valid pku id. This value may contain only numbers."
+msgstr "请输入一个正确的北大学工号，仅允许包含数字。"
