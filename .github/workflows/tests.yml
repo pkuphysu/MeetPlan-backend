@@ -27,7 +27,5 @@ jobs:
         run: |
           poetry run python manage.py makemigrations
           poetry run python manage.py migrate
-      - name: Run compilemessages
-        run: poetry run python manage.py compilemessages
       - name: Run test
         run: poetry run python manage.py test
