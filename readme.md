@@ -1,7 +1,7 @@
 # 北京大学物理学院本科生综合指导课后端
 
 ## 开发指南
-见 [CONTRIBUTING](CONTRIBUTING.md)
+见 [CONTRIBUTING](.github/CONTRIBUTING.md)
 
 ## 部署
 
