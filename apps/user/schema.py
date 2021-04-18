@@ -5,24 +5,25 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django_plus.types import ModelType
 from graphql_jwt.exceptions import PermissionDenied
 
-from apps.pku_auth.meta import AbstractMeta
+from apps.pku_auth.meta import AbstractMeta, PKTypeMixin
 from apps.user.models import User, Department
 
 
-class DepartmentType(ModelType):
+class DepartmentType(PKTypeMixin, ModelType):
     class Meta(AbstractMeta):
         description = _("123")
         model = Department
-        fields = ["id", "department", "user_set"]
+        fields = ["id", "pk", "department", "user_set"]
         filter_fields = {"department": ["icontains"]}
         allow_unauthenticated = True
 
 
-class UserType(ModelType):
+class UserType(PKTypeMixin, ModelType):
     class Meta(AbstractMeta):
         model = User
         fields = [
             "id",
+            "pk",
             # 'pku_id',
             "name",
             "email",
@@ -37,17 +38,15 @@ class UserType(ModelType):
             # 'date_joined',
             # 'last_login',
         ]
-        filter_fields = [
-            "id",
-            "pku_id",
-            "name",
-            "department__department",
-            "is_teacher",
-            "is_admin",
-            "is_active",
-        ]
-        allow_unauthenticated = True
-        convert_choices_to_enum = []
+        filter_fields = {
+            "pku_id": ["exact", "contains", "startswith"],
+            "name": ["icontains"],
+            "department__id": ["exact"],
+            "department__department": ["icontains"],
+            "is_teacher": ["exact"],
+            "is_admin": ["exact"],
+            "is_active": ["exact"],
+        }
 
     pku_id = graphene.String(description=_("Only allow user query himself or teacher query student on this field."))
 
