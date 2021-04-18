@@ -691,6 +691,97 @@ class ApiTest(GraphQLTestCase):
                 )
                 self.assertResponseNoErrors(response)
 
+    def test_departments_with_filter_id_exact(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: Float!){
+                  departments (id: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["departments"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, 1, self.assertResponseNoErrors, 1)
+            func(user, 2, self.assertResponseNoErrors, 1)
+            func(user, 3, self.assertResponseNoErrors, 1)
+            func(user, 4, self.assertResponseNoErrors, 0)
+            func(user, 0, self.assertResponseNoErrors, 0)
+
+    def test_departments_with_filter_id_in(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: [String]!){
+                  departments (id_In: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["departments"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, "1", self.assertResponseNoErrors, 1)
+            func(user, "2", self.assertResponseNoErrors, 1)
+            func(user, "3", self.assertResponseNoErrors, 1)
+            func(user, "4", self.assertResponseNoErrors, 0)
+            func(user, "0", self.assertResponseNoErrors, 0)
+            func(user, ["0", "1"], self.assertResponseNoErrors, 1)
+            func(user, ["1", "2"], self.assertResponseNoErrors, 2)
+            func(user, ["1", "2", "3"], self.assertResponseNoErrors, 3)
+
+    def test_departments_with_filter_department_icontains(self):
+        def func(user, name, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($name: String!){
+                  departments (department_Icontains: $name) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"name": name},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["departments"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, "teacher", self.assertResponseNoErrors, 1)
+            func(user, "student", self.assertResponseNoErrors, 1)
+            func(user, "admin", self.assertResponseNoErrors, 1)
+            func(user, "e", self.assertResponseNoErrors, 2)
+            func(user, "t", self.assertResponseNoErrors, 2)
+            func(user, "n", self.assertResponseNoErrors, 2)
+
     def test_department_without_token(self):
         for id in range(1, 4):
             response = self.query(
@@ -1011,7 +1102,68 @@ class ApiTest(GraphQLTestCase):
             func(user, "t", self.assertResponseNoErrors, 3)
             func(user, "a", self.assertResponseNoErrors, 3)
 
-    def test_users_with_filter_department_department_(self):
+    def test_users_with_filter_department_id_exact(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: Float!){
+                  users (department_Id: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["users"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, 1, self.assertResponseNoErrors, 2)
+            func(user, 2, self.assertResponseNoErrors, 1)
+            func(user, 3, self.assertResponseNoErrors, 1)
+            func(user, 4, self.assertResponseNoErrors, 0)
+            func(user, 0, self.assertResponseNoErrors, 0)
+
+    def test_users_with_filter_department_id_in(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: [String]!){
+                  users (department_Id_In: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["users"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, "1", self.assertResponseNoErrors, 2)
+            func(user, "2", self.assertResponseNoErrors, 1)
+            func(user, "3", self.assertResponseNoErrors, 1)
+            func(user, "4", self.assertResponseNoErrors, 0)
+            func(user, "0", self.assertResponseNoErrors, 0)
+            func(user, ["0", "1"], self.assertResponseNoErrors, 2)
+            func(user, ["1", "2"], self.assertResponseNoErrors, 3)
+            func(user, ["1", "2", "3"], self.assertResponseNoErrors, 4)
+
+    def test_users_with_filter_department_department_icontains(self):
         def func(user, name, assert_func, count):
             response = self.query(
                 """
@@ -1041,3 +1193,81 @@ class ApiTest(GraphQLTestCase):
             func(user, "a", self.assertResponseNoErrors, 2)
             func(user, "s", self.assertResponseNoErrors, 2)
             func(user, "t", self.assertResponseNoErrors, 3)
+
+    def test_users_with_filter_is_teacher_exact(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: Boolean!){
+                  users (isTeacher: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["users"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, True, self.assertResponseNoErrors, 2)
+            func(user, False, self.assertResponseNoErrors, 3)
+
+    def test_users_with_filter_is_admin_exact(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: Boolean!){
+                  users (isAdmin: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["users"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, True, self.assertResponseNoErrors, 2)
+            func(user, False, self.assertResponseNoErrors, 3)
+
+    def test_users_with_filter_is_active_exact(self):
+        def func(user, id, assert_func, count):
+            response = self.query(
+                """
+                query myQuery($id: Boolean!){
+                  users (isActive: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                      }
+                    }
+                  }
+                }
+                """,
+                variables={"id": id},
+                headers=self.get_headers(user),
+            )
+            content = json.loads(response.content)
+            assert_func(response)
+            self.assertEqual(content["data"]["users"]["totalCount"], count)
+
+        for user in self.users:
+            func(user, True, self.assertResponseNoErrors, 5)
+            func(user, False, self.assertResponseNoErrors, 0)

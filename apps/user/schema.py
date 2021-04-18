@@ -14,7 +14,7 @@ class DepartmentType(PKTypeMixin, ModelType):
         description = _("123")
         model = Department
         fields = ["id", "pk", "department", "user_set"]
-        filter_fields = {"department": ["icontains"]}
+        filter_fields = {"id": ["exact", "in"], "department": ["icontains"]}
         allow_unauthenticated = True
 
 
@@ -41,7 +41,7 @@ class UserType(PKTypeMixin, ModelType):
         filter_fields = {
             "pku_id": ["exact", "contains", "startswith"],
             "name": ["icontains"],
-            "department__id": ["exact"],
+            "department__id": ["exact", "in"],
             "department__department": ["icontains"],
             "is_teacher": ["exact"],
             "is_admin": ["exact"],
