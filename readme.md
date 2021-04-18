@@ -59,14 +59,14 @@ poetry run python manage.py compilemessages
         proxy_set_header REMOTE-HOST $remote_addr;
         proxy_set_header X-Forwarded-Proto $scheme;
     }
-    
+
     location /static {
         alias /path/to/project/assets;
         expires      12h;
         error_log /dev/null;
         access_log off;
     }
-    
+
     location /media {
         alias /path/to/project/media;
         expires      30d;

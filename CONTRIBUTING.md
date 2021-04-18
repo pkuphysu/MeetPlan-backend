@@ -1,5 +1,5 @@
 # Contributing 贡献
-  
+
 Thanks for helping to make meet plan system great!
 
 感谢您帮助使综合指导课系统变得更好！
@@ -30,6 +30,14 @@ After cloning this repo, first you should install [Poetry](https://python-poetry
 
 ```sh
 poetry install
+```
+
+Then, you should install [pre-commit](https://pre-commit.com/) hook of git, and enable it to this project.
+
+然后，你应该安装 git 的 [pre-commit](https://pre-commit.com/) 钩子，然后在本仓库将它启用。
+
+```shell
+pre-commit install
 ```
 
 ## Development 进行开发
@@ -67,12 +75,14 @@ We advise that you format and run lint locally before doing this to save time:
 
 我们建议您在提交代码前在本地进行格式化，以节省时间：
 
+> 如果你按照上面的流程安装了 pre-commit, 下面的命令会在你提交代码时自动执行
+
 ```sh
 black -l 120 --exclude "/migrations/" apps MeetPlan
 flake8 apps MeetPlan manage.py
 ```
 
-## Documentation 文献资料 
+## Documentation 文献资料
 
 The documentation is not available now. You can contribute it!
 
