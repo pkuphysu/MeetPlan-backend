@@ -20,7 +20,7 @@ from graphql_jwt.refresh_token.shortcuts import get_refresh_token
 from graphql_jwt.refresh_token.utils import get_refresh_token_model
 
 import apps.user.schema
-from apps.pku_auth.meta import AbstractMeta
+from apps.pku_auth.meta import AbstractMeta, FieldWithDocs
 from apps.pku_auth.models import OpenIDClient
 
 
@@ -96,8 +96,6 @@ class OpenIDClientType(ModelType):
 
 
 class Query(graphene.ObjectType):
-    from .meta import FieldWithDocs
-
     openid_client = FieldWithDocs(OpenIDClientType)
 
     @staticmethod

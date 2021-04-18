@@ -70,3 +70,7 @@ class AbstractMeta:
 class FieldWithDocs(graphene.Field):
     def __init__(self, type_, description=None, **extra_args):
         super().__init__(type_, description=description or type_._meta.description, **extra_args)
+
+
+class PKTypeMixin:
+    pk = graphene.Int(description="used for foreign key filtering")
