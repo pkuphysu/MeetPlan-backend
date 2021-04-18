@@ -36,6 +36,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "graphene_django",
+    "django_filters",
     "graphql_jwt.refresh_token",
     "guardian",
     "apps.user",
@@ -161,7 +162,7 @@ GRAPHQL_JWT = {
     "JWT_VERIFY_EXPIRATION": True,
     "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
     "JWT_REUSE_REFRESH_TOKENS": True,
-    "JWT_EXPIRATION_DELTA": timedelta(minutes=5),
+    "JWT_EXPIRATION_DELTA": timedelta(hours=1),
     "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
     "JWT_ALLOW_ANY_CLASSES": [
         "apps.pku_auth.schema.ObtainJSONWebToken",
@@ -171,3 +172,7 @@ GRAPHQL_JWT = {
         "apps.pku_auth.schema.RevokeAll",
     ],
 }
+
+# Django Guardian
+# https://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
+ANONYMOUS_USER_NAME = "0000000000"

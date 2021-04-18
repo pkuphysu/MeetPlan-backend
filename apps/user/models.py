@@ -40,7 +40,6 @@ class User(AbstractUser, GuardianUserMixin):
     address = models.CharField(_("address"), max_length=50, blank=True)
     is_teacher = models.BooleanField(
         _("is teacher"),
-        choices=((False, _("student")), (True, _("teacher"))),
         default=False,
         help_text=_("Designates whether the user is a teacher."),
     )
@@ -60,7 +59,6 @@ class User(AbstractUser, GuardianUserMixin):
     is_admin = models.BooleanField(
         _("is admin"),
         default=False,
-        choices=((False, _("False")), (True, _("True"))),
         help_text=_("Admin user can manage this site."),
     )
     REQUIRED_FIELDS = ["email"]
