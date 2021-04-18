@@ -1,27 +1,22 @@
-# 北京大学物理学院本科生综合指导课
+# 北京大学物理学院本科生综合指导课后端
 
 ## 开发指南
 见 [CONTRIBUTING](CONTRIBUTING.md)
 
 ## 部署
 
-### 安装 [poetry](https://github.com/python-poetry/poetry) 并安装项目依赖
+### 安装 [poetry](https://github.com/python-poetry/poetry)
 
-> 进阶用法，使用 pyenv+poetry 管理你的虚拟环境。
+> 进阶用法，使用 pyenv + poetry 管理你的虚拟环境。
 
 ### 安装项目依赖
 
-重启 shell
+重启 shell 后，执行
 
 ```shell
-poetry install
+poetry install --no-dev -E {mysql or pgsql}
 ```
-
-如果是生产环境：
-
-```shell
-poetry install --no-dev
-```
+> 上述命令中中括号内根据实际需要二选一即可
 
 ### 设置部分
 
