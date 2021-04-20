@@ -43,6 +43,7 @@ class OpenIDClientBackend:
             user.address = userinfo["address"]["formatted"] if "address" in userinfo else ""
             user.is_teacher = userinfo["is_teacher"] if "is_teacher" in userinfo else False
             user.introduce = userinfo["introduce"] if "introduce" in userinfo else ""
+            user.set_unusable_password()
             user.save(
                 update_fields=[
                     "name",
