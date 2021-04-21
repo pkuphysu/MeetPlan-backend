@@ -1,4 +1,12 @@
 # 北京大学物理学院本科生综合指导课后端
+[![build][build-image]][build-url]
+[![codecov][codecov-image]][codecov-url]
+
+[build-image]: https://github.com/pkuphysu/MeetPlan-backend/actions/workflows/tests.yml/badge.svg
+[build-url]: https://github.com/pkuphysu/MeetPlan-backend/actions
+[codecov-image]: https://codecov.io/gh/pkuphysu/MeetPlan-backend/branch/master/graph/badge.svg?token=ihNGZISgFl
+[codecov-url]: https://codecov.io/gh/pkuphysu/MeetPlan-backend
+
 
 ## 开发指南
 见 [CONTRIBUTING](.github/CONTRIBUTING.md)
