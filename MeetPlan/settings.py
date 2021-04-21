@@ -143,6 +143,8 @@ LOCALE_PATHS = [
     BASE_DIR / "translation" / "locale",
     BASE_DIR / "translation" / "django_celery_beat",
     BASE_DIR / "translation" / "django_celery_results",
+    BASE_DIR / "translation" / "graphql_jwt",
+    BASE_DIR / "translation" / "refresh_token",
 ]
 
 TIME_ZONE = "Asia/Shanghai"
