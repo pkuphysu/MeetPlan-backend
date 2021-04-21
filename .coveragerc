@@ -1,0 +1,3 @@
+[run]
+source=apps,MeetPlan
+omit=apps/*/test*,apps/*/migrations/*
