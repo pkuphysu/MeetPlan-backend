@@ -1,5 +1,8 @@
 import json
+from io import StringIO
+from unittest import mock
 
+from django.core.management import call_command
 from django.test import TestCase
 from graphene_django.utils.testing import GraphQLTestCase
 from graphql_jwt.settings import jwt_settings
@@ -13,9 +16,29 @@ from apps.user.schema import DepartmentType, UserType
 
 
 class ModelTest(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        pass
+    def test_department(self):
+        department = Department.objects.create(department="123")
+        self.assertEqual(department.__str__(), "123")
+
+    def test_user(self):
+        user = User.objects.create(name="alice")
+        self.assertEqual(user.get_full_name(), "alice")
+        self.assertEqual(user.get_short_name(), "alice")
+
+
+class CommandTest(TestCase):
+    @mock.patch("apps.pku_auth.management.commands.createclient.input")
+    def _call_wrapper(self, response_value, mock_input=None):
+        def input_response(message):
+            return response_value
+
+        mock_input.side_effect = input_response
+        out = StringIO()
+        call_command("createclient", stdout=out)
+        return out.getvalue().rstrip()
+
+    def test_command(self):
+        self.assertIn("OpenID client successfully created.", self._call_wrapper("http"))
 
 
 class SignalTest(TestCase):
@@ -1699,7 +1722,6 @@ class MutationApiTest(GraphQLTestCase):
             headers=self.get_headers(self.user),
         )
         content = json.loads(response.content)
-        print(content)
         self.assertResponseNoErrors(response)
         data = content["data"]
         self.assertIsNotNone(data["userDelete"])
