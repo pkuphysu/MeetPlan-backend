@@ -54,7 +54,6 @@ class UserAdmin(GuardedModelAdminMixin, BaseUserAdmin):
                     "is_active",
                     "is_teacher",
                     "is_admin",
-                    "is_staff",
                     "is_superuser",
                     "department",
                     "groups",
@@ -77,7 +76,6 @@ class UserAdmin(GuardedModelAdminMixin, BaseUserAdmin):
     list_filter = (
         "is_teacher",
         "is_admin",
-        "is_staff",
         "is_superuser",
         "is_active",
         "groups",

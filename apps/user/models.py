@@ -67,6 +67,10 @@ class User(AbstractUser, GuardianUserMixin):
     class Meta(AbstractUser.Meta):
         abstract = False
 
+    @property
+    def is_staff(self):
+        return self.is_superuser
+
     def get_full_name(self):
         return self.name
 
