@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
 if DEBUG:
     INSTALLED_APPS.append("debug_toolbar")
+    INTERNAL_IPS = ["127.0.0.1", "localhost"]
     DEBUG_TOOLBAR_PANELS = [
         "debug_toolbar.panels.history.HistoryPanel",
         "debug_toolbar.panels.timer.TimerPanel",
@@ -61,11 +62,6 @@ if DEBUG:
         "debug_toolbar.panels.redirects.RedirectsPanel",
         "debug_toolbar.panels.profiling.ProfilingPanel",
     ]
-
-    def show_toolbar_callback(request):
-        return True
-
-    DEBUG_TOOLBAR_CONFIG = {"SHOW_TOOLBAR_CALLBACK": show_toolbar_callback}
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

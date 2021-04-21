@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from unittest import mock
 
 from django.test import TestCase, override_settings
+from django.utils.translation import gettext_lazy as _
 from freezegun import freeze_time
 from graphene_django.utils.testing import GraphQLTestCase
 from graphql_jwt.settings import jwt_settings
@@ -289,4 +290,4 @@ class ApiTestWithJWT(GraphQLTestCase):
             content = json.loads(response.content)
             self.assertResponseHasErrors(response)
             self.assertIsNone(content["data"]["verifyToken"])
-            self.assertEqual(content["errors"][0]["message"], "Signature has expired")
+            self.assertEqual(content["errors"][0]["message"], _("Signature has expired"))
