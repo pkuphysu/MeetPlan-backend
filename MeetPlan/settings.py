@@ -173,6 +173,8 @@ GRAPHQL_JWT = {
     ],
 }
 
+GRAPHENE_DJANGO_PLUS = {"MUTATIONS_INCLUDE_REVERSE_RELATIONS": False}
+
 # Django Guardian
 # https://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name
 ANONYMOUS_USER_NAME = "0000000000"

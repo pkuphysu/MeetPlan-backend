@@ -1,15 +1,15 @@
 import json
 
-from graphene_django.utils.testing import GraphQLTestCase
-from graphql_relay import to_global_id
-from graphql_jwt.shortcuts import get_token
-from graphql_jwt.settings import jwt_settings
 from django.test import TestCase
+from graphene_django.utils.testing import GraphQLTestCase
+from graphql_jwt.settings import jwt_settings
+from graphql_jwt.shortcuts import get_token
+from graphql_relay import to_global_id
+from guardian.shortcuts import assign_perm
 
 from apps.pku_auth.signals import user_create
-
 from apps.user.models import User, Department
-from apps.user.schema import DepartmentType
+from apps.user.schema import DepartmentType, UserType
 
 
 class ModelTest(TestCase):
@@ -28,7 +28,7 @@ class SignalTest(TestCase):
         self.assertTrue(self.user.has_perm("change_user", self.user))
 
 
-class ApiTest(GraphQLTestCase):
+class QueryApiTest(GraphQLTestCase):
     @classmethod
     def setUpTestData(cls):
         cls.department1 = Department.objects.create(department="student")
@@ -1271,3 +1271,441 @@ class ApiTest(GraphQLTestCase):
         for user in self.users:
             func(user, True, self.assertResponseNoErrors, 5)
             func(user, False, self.assertResponseNoErrors, 0)
+
+
+class MutationApiTest(GraphQLTestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.department = Department.objects.create(department="student")
+        cls.user = User.objects.create(
+            pku_id="2000000000",
+            name="student",
+            email="student@pku.edu.cn",
+            website="https://www.pku.edu.cn",
+            phone_number="123456789",
+            address="student office",
+            department=cls.department,
+            introduce="student introduce",
+            is_teacher=False,
+            is_admin=False,
+            is_active=True,
+        )
+        cls.user.set_unusable_password()
+        cls.user.save()
+
+    @staticmethod
+    def get_headers(user):
+        return {
+            jwt_settings.JWT_AUTH_HEADER_NAME: f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}",
+        }
+
+    def test_me_without_token(self):
+        response = self.query(
+            """
+            mutation myMutation($input: MeMutationInput!){
+              me(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  id
+                  name
+                }
+              }
+            }
+            """,
+            input_data={
+                "id": to_global_id(UserType._meta.name, str(2)),
+                "clientMutationId": "without token",
+            },
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_me(self):
+        department = Department.objects.create(department="test")
+        response = self.query(
+            """
+            mutation myMutation($input: MeMutationInput!){
+              me(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  id
+                  name
+                  email
+                  website
+                  phoneNumber
+                  address
+                  introduce
+                  department {
+                    department
+                  }
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "id": to_global_id(UserType._meta.name, str(self.user.pk)),
+                "name": "m student",
+                "email": "m.student@pku.edu.cn",
+                "website": "https://wwws.pku.edu.cn",
+                "phoneNumber": "987654321",
+                "address": "m student office",
+                "department": to_global_id(DepartmentType._meta.name, str(department.id)),
+                "introduce": "m student introduce",
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        me = content["data"]["me"]
+        self.assertEqual(me["errors"], [])
+        self.assertEqual(me["clientMutationId"], "with token")
+        user = me["user"]
+        self.assertEqual(user["name"], "m student")
+        self.assertEqual(user["email"], "m.student@pku.edu.cn")
+        self.assertEqual(user["website"], "https://wwws.pku.edu.cn")
+        self.assertEqual(user["phoneNumber"], "987654321")
+        self.assertEqual(user["address"], "m student office")
+        self.assertEqual(user["department"]["department"], department.department)
+        self.assertEqual(user["introduce"], "m student introduce")
+        self.user = User.objects.get(id=self.user.id)
+        self.assertEqual(self.user.name, "m student"),
+        self.assertEqual(self.user.email, "m.student@pku.edu.cn")
+        self.assertEqual(self.user.website, "https://wwws.pku.edu.cn")
+        self.assertEqual(self.user.phone_number, "987654321")
+        self.assertEqual(self.user.address, "m student office")
+        self.assertEqual(self.user.department.id, department.id)
+        self.assertEqual(self.user.introduce, "m student introduce")
+
+    def test_me_on_no_permission_field(self):
+        for item, key in {
+            "pkuId": "123",
+            "isTeacher": True,
+            "isAdmin": True,
+            "isActive": True,
+            "dateJoined": None,
+            "lastLogin": None,
+            "password": "123",
+        }.items():
+            response = self.query(
+                """
+                mutation myMutation($input: MeMutationInput!){
+                  me(input: $input){
+                    errors{
+                      field
+                      message
+                    }
+                    clientMutationId
+                    user{
+                      id
+                      name
+                    }
+                  }
+                }
+                """,
+                input_data={
+                    "clientMutationId": "with token",
+                    "id": to_global_id(UserType._meta.name, str(self.user.pk)),
+                    item: key,
+                },
+                headers=self.get_headers(self.user),
+            )
+            self.assertResponseHasErrors(response)
+
+    def test_user_create_without_token(self):
+        assign_perm("user.add_user", self.user)
+        response = self.query(
+            """
+            mutation myMutation($input: UserCreateInput!){
+              userCreate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  id
+                  name
+                }
+              }
+            }
+            """,
+            input_data={"clientMutationId": "without token", "email": "test@pku.edu.cn", "pkuId": "2000000001"},
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_user_create(self):
+        self.user.is_admin = True
+        self.user.save()
+        assign_perm("user.add_user", self.user)
+        response = self.query(
+            """
+            mutation myMutation($input: UserCreateInput!){
+              userCreate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  pkuId
+                  name
+                  website
+                  email
+                  phoneNumber
+                  introduce
+                  department {
+                    department
+                  }
+                  isTeacher
+                  isAdmin
+                  isActive
+                  dateJoined
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "pkuId": "2000000001",
+                "email": "test@pku.edu.cn",
+                "website": "https://phy.pku.edu.cn",
+                "phoneNumber": "987654321",
+                "introduce": "new user",
+                "department": to_global_id(DepartmentType._meta.name, str(self.department.id)),
+                "isTeacher": True,
+                "isAdmin": False,
+                "isActive": True,
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        data = content["data"]
+        self.assertIsNotNone(data["userCreate"])
+        user_create = data["userCreate"]
+        self.assertEqual(user_create["errors"], [])
+        self.assertEqual(user_create["clientMutationId"], "with token")
+        self.assertIsNotNone(user_create["user"])
+        user = user_create["user"]
+        self.assertEqual(user["pkuId"], "2000000001")
+        self.assertEqual(user["email"], "test@pku.edu.cn")
+        self.assertEqual(user["website"], "https://phy.pku.edu.cn")
+        self.assertEqual(user["phoneNumber"], "987654321")
+        self.assertEqual(user["introduce"], "new user")
+        self.assertEqual(user["department"]["department"], self.department.department)
+        self.assertEqual(user["isTeacher"], True)
+        self.assertEqual(user["isAdmin"], False)
+        self.assertEqual(user["isActive"], True)
+        self.assertIsNotNone(user["dateJoined"])
+
+    def test_user_update_without_token(self):
+        assign_perm("user.change_user", self.user)
+        user = User.objects.create(
+            pku_id="2000000001",
+            name="teacher",
+            email="teacher@pku.edu.cn",
+            website="https://www.pku.edu.cn",
+            phone_number="123456789",
+            address="teacher office",
+            department=None,
+            introduce="teacher introduce",
+            is_teacher=True,
+            is_admin=False,
+            is_active=True,
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: UserUpdateInput!){
+              userUpdate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  id
+                  name
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "without token",
+                "id": to_global_id(UserType._meta.name, str(user.id)),
+                "email": "test@pku.edu.cn",
+                "pkuId": "2000000001",
+            },
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_user_update(self):
+        self.user.is_admin = True
+        self.user.save()
+        assign_perm("user.change_user", self.user)
+        user = User.objects.create(
+            pku_id="2000000001",
+            name="teacher",
+            email="teacher@pku.edu.cn",
+            website="https://www.pku.edu.cn",
+            phone_number="123456789",
+            address="teacher office",
+            department=None,
+            introduce="teacher introduce",
+            is_teacher=True,
+            is_admin=False,
+            is_active=True,
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: UserUpdateInput!){
+              userUpdate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  pkuId
+                  name
+                  website
+                  email
+                  phoneNumber
+                  introduce
+                  department {
+                    department
+                  }
+                  isTeacher
+                  isAdmin
+                  isActive
+                  dateJoined
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "id": to_global_id(UserType._meta.name, str(user.id)),
+                "department": to_global_id(DepartmentType._meta.name, str(self.department.id)),
+                "isTeacher": False,
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        data = content["data"]
+        self.assertIsNotNone(data["userUpdate"])
+        user_update = data["userUpdate"]
+        self.assertEqual(user_update["errors"], [])
+        self.assertEqual(user_update["clientMutationId"], "with token")
+        self.assertIsNotNone(user_update["user"])
+        user2 = user_update["user"]
+        self.assertEqual(user2["department"]["department"], self.department.department)
+        self.assertEqual(user2["isTeacher"], False)
+
+    def test_user_delete_without_token(self):
+        assign_perm("user.delete_user", self.user)
+        user = User.objects.create(
+            pku_id="2000000001",
+            name="teacher",
+            email="teacher@pku.edu.cn",
+            website="https://www.pku.edu.cn",
+            phone_number="123456789",
+            address="teacher office",
+            department=None,
+            introduce="teacher introduce",
+            is_teacher=True,
+            is_admin=False,
+            is_active=True,
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: UserDeleteInput!){
+              userDelete(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  id
+                  name
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "without token",
+                "id": to_global_id(UserType._meta.name, str(user.id)),
+            },
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_user_delete(self):
+        self.user.is_admin = True
+        self.user.save()
+        assign_perm("user.delete_user", self.user)
+        user = User.objects.create(
+            pku_id="2000000001",
+            name="teacher",
+            email="teacher@pku.edu.cn",
+            website="https://www.pku.edu.cn",
+            phone_number="123456789",
+            address="teacher office",
+            department=None,
+            introduce="teacher introduce",
+            is_teacher=True,
+            is_admin=False,
+            is_active=True,
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: UserDeleteInput!){
+              userDelete(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  pkuId
+                  name
+                  website
+                  email
+                  phoneNumber
+                  introduce
+                  department {
+                    department
+                  }
+                  isTeacher
+                  isAdmin
+                  isActive
+                  dateJoined
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "id": to_global_id(UserType._meta.name, str(user.id)),
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        print(content)
+        self.assertResponseNoErrors(response)
+        data = content["data"]
+        self.assertIsNotNone(data["userDelete"])
+        user_update = data["userDelete"]
+        self.assertEqual(user_update["errors"], [])
+        self.assertEqual(user_update["clientMutationId"], "with token")
+        self.assertIsNotNone(user_update["user"])
+        with self.assertRaises(User.DoesNotExist):
+            User.objects.get(pk=user.id)

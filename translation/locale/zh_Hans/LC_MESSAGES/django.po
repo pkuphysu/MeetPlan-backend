@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-18 03:10+0800\n"
+"POT-Creation-Date: 2021-04-20 22:21+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -70,7 +70,7 @@ msgstr "权限"
 msgid "Important dates"
 msgstr "重要日期"
 
-#: apps/user/models.py:10 apps/user/models.py:50
+#: apps/user/models.py:10 apps/user/models.py:49
 msgid "department"
 msgstr "部门"
 
@@ -118,53 +118,41 @@ msgstr "地址"
 msgid "is teacher"
 msgstr "职工状态"
 
-#: apps/user/models.py:43
-msgid "student"
-msgstr "学生"
-
-#: apps/user/models.py:43
-msgid "teacher"
-msgstr "教职工"
-
-#: apps/user/models.py:45
+#: apps/user/models.py:44
 msgid "Designates whether the user is a teacher."
 msgstr "指明用户是否为老师。"
 
-#: apps/user/models.py:55
+#: apps/user/models.py:54
 msgid "introduce"
 msgstr "简介"
 
-#: apps/user/models.py:58
+#: apps/user/models.py:57
 msgid "Your personal introduction."
 msgstr "你的个人简介。"
 
-#: apps/user/models.py:61
+#: apps/user/models.py:60
 msgid "is admin"
 msgstr "管理员状态"
 
-#: apps/user/models.py:63
-msgid "False"
-msgstr "否"
-
-#: apps/user/models.py:63
-msgid "True"
-msgstr "是"
-
-#: apps/user/models.py:64
+#: apps/user/models.py:62
 msgid "Admin user can manage this site."
 msgstr "管理员可以管理这个站点。"
 
-#: apps/user/schema.py:14
+#: apps/user/schema.py:19
 msgid "123"
 msgstr ""
 
-#: apps/user/schema.py:52
+#: apps/user/schema.py:56
 msgid "Only allow user query himself or teacher query student on this field."
 msgstr "此字段仅允许用户查询自己或教师查询学生"
 
-#: apps/user/schema.py:65 apps/user/schema.py:75 apps/user/schema.py:85
+#: apps/user/schema.py:69 apps/user/schema.py:79 apps/user/schema.py:89
 msgid "Only allow user query himself on this field."
 msgstr "此字段仅允许用户查询自己。"
+
+#: apps/user/schema.py:164
+msgid "This api only allow update yourself."
+msgstr "这个 api 只允许更新你自己。"
 
 #: apps/user/validators.py:9
 msgid "Enter a valid pku id. This value may contain only numbers."
