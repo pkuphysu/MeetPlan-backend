@@ -27,7 +27,11 @@ jobs:
           poetry run python manage.py makemigrations
           poetry run python manage.py migrate
       - name: Run test
-        run: poetry run python manage.py test
+        run: poetry run pytest
+      - name: Upload coverage
+        uses: codecov/codecov-action@v1
+        with:
+          name: Python 3.9
       - name: Lint
         run: |
           poetry run flake8 --count --show-source --statistics apps MeetPlan manage.py
