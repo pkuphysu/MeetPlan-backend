@@ -17,7 +17,6 @@ from apps.user.models import User, Department
 
 class DepartmentType(PKTypeMixin, ModelType):
     class Meta(AbstractMeta):
-        description = _("123")
         model = Department
         fields = ["id", "pk", "department", "user_set"]
         filter_fields = {"id": ["exact", "in"], "department": ["icontains"]}

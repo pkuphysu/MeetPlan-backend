@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-20 22:21+0800\n"
+"POT-Creation-Date: 2021-04-22 02:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,6 +17,86 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+
+#: apps/meet_plan/admin.py:20
+msgid "Teacher Name"
+msgstr "教师名字"
+
+#: apps/meet_plan/admin.py:25
+msgid "Teacher PKU ID"
+msgstr "教师职工号"
+
+#: apps/meet_plan/admin.py:30 apps/meet_plan/admin.py:36
+msgid "None"
+msgstr "无"
+
+#: apps/meet_plan/admin.py:30
+msgid "Student Name"
+msgstr "学生名字"
+
+#: apps/meet_plan/admin.py:36
+msgid "Student PKU ID"
+msgstr "学生学号"
+
+#: apps/meet_plan/models.py:8
+msgid "place"
+msgstr "地点"
+
+#: apps/meet_plan/models.py:9
+msgid "start time"
+msgstr "开始时间"
+
+#: apps/meet_plan/models.py:11
+msgid "duration"
+msgstr "时长"
+
+#: apps/meet_plan/models.py:13
+msgid "half an hour"
+msgstr "半小时"
+
+#: apps/meet_plan/models.py:14
+msgid "an hour"
+msgstr "一小时"
+
+#: apps/meet_plan/models.py:15
+msgid "an hour and a half"
+msgstr "一个半小时"
+
+#: apps/meet_plan/models.py:16
+msgid "two hours"
+msgstr "两小时"
+
+#: apps/meet_plan/models.py:18
+msgid "teacher message"
+msgstr "教师备注"
+
+#: apps/meet_plan/models.py:19
+msgid "available"
+msgstr "可选"
+
+#: apps/meet_plan/models.py:24
+msgid "student message"
+msgstr "学生留言"
+
+#: apps/meet_plan/models.py:25
+msgid "status"
+msgstr "状态"
+
+#: apps/meet_plan/models.py:28
+msgid "meet plan"
+msgstr "综合指导课"
+
+#: apps/meet_plan/models.py:29
+msgid "meet plans"
+msgstr "综合指导课"
+
+#: apps/meet_plan/models.py:31
+msgid "Can edit meet plan."
+msgstr "可以编辑综合指导课。"
+
+#: apps/meet_plan/models.py:32
+msgid "Can delete meet plan order."
+msgstr "可以删除综合指导课预约。"
 
 #: apps/pku_auth/models.py:6
 msgid "client id"
@@ -66,7 +146,7 @@ msgstr "个人信息"
 msgid "Permissions"
 msgstr "权限"
 
-#: apps/user/admin.py:65
+#: apps/user/admin.py:64
 msgid "Important dates"
 msgstr "重要日期"
 
@@ -138,10 +218,6 @@ msgstr "管理员状态"
 msgid "Admin user can manage this site."
 msgstr "管理员可以管理这个站点。"
 
-#: apps/user/schema.py:19
-msgid "123"
-msgstr ""
-
 #: apps/user/schema.py:56
 msgid "Only allow user query himself or teacher query student on this field."
 msgstr "此字段仅允许用户查询自己或教师查询学生"
@@ -150,7 +226,7 @@ msgstr "此字段仅允许用户查询自己或教师查询学生"
 msgid "Only allow user query himself on this field."
 msgstr "此字段仅允许用户查询自己。"
 
-#: apps/user/schema.py:164
+#: apps/user/schema.py:163
 msgid "This api only allow update yourself."
 msgstr "这个 api 只允许更新你自己。"
 
