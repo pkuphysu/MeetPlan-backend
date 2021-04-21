@@ -1731,3 +1731,187 @@ class MutationApiTest(GraphQLTestCase):
         self.assertIsNotNone(user_update["user"])
         with self.assertRaises(User.DoesNotExist):
             User.objects.get(pk=user.id)
+
+    def test_department_create_without_token(self):
+        assign_perm("user.add_department", self.user)
+        response = self.query(
+            """
+            mutation myMutation($input: DepartmentCreateInput!){
+              departmentCreate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                user{
+                  id
+                  name
+                }
+              }
+            }
+            """,
+            input_data={"clientMutationId": "without token", "department": "teacher"},
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_department_create(self):
+        assign_perm("user.add_department", self.user)
+        response = self.query(
+            """
+            mutation myMutation($input: DepartmentCreateInput!){
+              departmentCreate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                department{
+                  id
+                  department
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "department": "teacher",
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        data = content["data"]
+        self.assertIsNotNone(data["departmentCreate"])
+        department_create = data["departmentCreate"]
+        self.assertEqual(department_create["errors"], [])
+        self.assertEqual(department_create["clientMutationId"], "with token")
+        self.assertIsNotNone(department_create["department"])
+        department = department_create["department"]
+        self.assertEqual(department["department"], "teacher")
+
+    def test_department_update_without_token(self):
+        assign_perm("user.change_department", self.user)
+        department = Department.objects.create(department="test")
+        response = self.query(
+            """
+            mutation myMutation($input: DepartmentUpdateInput!){
+              departmentUpdate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                department {
+                  id
+                  department
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "without token",
+                "id": to_global_id(DepartmentType._meta.name, str(department.id)),
+                "department": "m test",
+            },
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_department_update(self):
+        assign_perm("user.change_department", self.user)
+        department = Department.objects.create(department="test")
+        response = self.query(
+            """
+            mutation myMutation($input: DepartmentUpdateInput!){
+              departmentUpdate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                department{
+                  id
+                  department
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "id": to_global_id(DepartmentType._meta.name, str(department.id)),
+                "department": "m test",
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        data = content["data"]
+        self.assertIsNotNone(data["departmentUpdate"])
+        department_update = data["departmentUpdate"]
+        self.assertEqual(department_update["errors"], [])
+        self.assertEqual(department_update["clientMutationId"], "with token")
+        self.assertIsNotNone(department_update["department"])
+        department2 = department_update["department"]
+        department = Department.objects.get(id=department.id)
+        self.assertEqual(department2["department"], department.department)
+
+    def test_department_delete_without_token(self):
+        assign_perm("user.delete_department", self.user)
+        department = Department.objects.create(department="test")
+        response = self.query(
+            """
+            mutation myMutation($input: DepartmentDeleteInput!){
+              departmentDelete(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                department{
+                  id
+                  department
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "without token",
+                "id": to_global_id(DepartmentType._meta.name, str(department.id)),
+            },
+        )
+        self.assertResponseHasErrors(response)
+
+    def test_department_delete(self):
+        assign_perm("user.delete_department", self.user)
+        department = Department.objects.create(department="test")
+        response = self.query(
+            """
+            mutation myMutation($input: DepartmentDeleteInput!){
+              departmentDelete(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                department {
+                  id
+                  department
+                }
+              }
+            }
+            """,
+            input_data={
+                "clientMutationId": "with token",
+                "id": to_global_id(DepartmentType._meta.name, str(department.id)),
+            },
+            headers=self.get_headers(self.user),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        data = content["data"]
+        self.assertIsNotNone(data["departmentDelete"])
+        department_update = data["departmentDelete"]
+        self.assertEqual(department_update["errors"], [])
+        self.assertEqual(department_update["clientMutationId"], "with token")
+        self.assertIsNotNone(department_update["department"])
+        with self.assertRaises(Department.DoesNotExist):
+            Department.objects.get(pk=department.id)
