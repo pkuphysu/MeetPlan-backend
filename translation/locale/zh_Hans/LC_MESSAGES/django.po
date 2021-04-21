@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-22 02:01+0800\n"
+"POT-Creation-Date: 2021-04-22 02:28+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,25 +18,29 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/meet_plan/admin.py:20
+#: apps/meet_plan/admin.py:28
 msgid "Teacher Name"
 msgstr "教师名字"
 
-#: apps/meet_plan/admin.py:25
+#: apps/meet_plan/admin.py:33
 msgid "Teacher PKU ID"
 msgstr "教师职工号"
 
-#: apps/meet_plan/admin.py:30 apps/meet_plan/admin.py:36
+#: apps/meet_plan/admin.py:38 apps/meet_plan/admin.py:44
 msgid "None"
 msgstr "无"
 
-#: apps/meet_plan/admin.py:30
+#: apps/meet_plan/admin.py:38
 msgid "Student Name"
 msgstr "学生名字"
 
-#: apps/meet_plan/admin.py:36
+#: apps/meet_plan/admin.py:44
 msgid "Student PKU ID"
 msgstr "学生学号"
+
+#: apps/meet_plan/apps.py:8
+msgid "Meet plan"
+msgstr "综合指导课"
 
 #: apps/meet_plan/models.py:8
 msgid "place"
@@ -50,53 +54,57 @@ msgstr "开始时间"
 msgid "duration"
 msgstr "时长"
 
-#: apps/meet_plan/models.py:13
+#: apps/meet_plan/models.py:12
 msgid "half an hour"
 msgstr "半小时"
 
-#: apps/meet_plan/models.py:14
+#: apps/meet_plan/models.py:12
 msgid "an hour"
 msgstr "一小时"
 
-#: apps/meet_plan/models.py:15
+#: apps/meet_plan/models.py:12
 msgid "an hour and a half"
 msgstr "一个半小时"
 
-#: apps/meet_plan/models.py:16
+#: apps/meet_plan/models.py:12
 msgid "two hours"
 msgstr "两小时"
 
-#: apps/meet_plan/models.py:18
+#: apps/meet_plan/models.py:14
 msgid "teacher message"
 msgstr "教师备注"
 
-#: apps/meet_plan/models.py:19
+#: apps/meet_plan/models.py:15
 msgid "available"
 msgstr "可选"
 
-#: apps/meet_plan/models.py:24
+#: apps/meet_plan/models.py:19
 msgid "student message"
 msgstr "学生留言"
 
-#: apps/meet_plan/models.py:25
+#: apps/meet_plan/models.py:20
 msgid "status"
 msgstr "状态"
 
-#: apps/meet_plan/models.py:28
+#: apps/meet_plan/models.py:23
 msgid "meet plan"
 msgstr "综合指导课"
 
-#: apps/meet_plan/models.py:29
+#: apps/meet_plan/models.py:24
 msgid "meet plans"
 msgstr "综合指导课"
 
-#: apps/meet_plan/models.py:31
+#: apps/meet_plan/models.py:25
 msgid "Can edit meet plan."
 msgstr "可以编辑综合指导课。"
 
-#: apps/meet_plan/models.py:32
+#: apps/meet_plan/models.py:25
 msgid "Can delete meet plan order."
 msgstr "可以删除综合指导课预约。"
+
+#: apps/pku_auth/apps.py:8
+msgid "Openid Client"
+msgstr "OpenID 应用"
 
 #: apps/pku_auth/models.py:6
 msgid "client id"
@@ -149,6 +157,10 @@ msgstr "权限"
 #: apps/user/admin.py:64
 msgid "Important dates"
 msgstr "重要日期"
+
+#: apps/user/apps.py:11
+msgid "User management"
+msgstr "用户管理"
 
 #: apps/user/models.py:10 apps/user/models.py:49
 msgid "department"
