@@ -1,23 +1,11 @@
 from django.conf import settings
 from django.db import models
-from django.db.models import Case, When, Value
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from graphene_django_plus.models import GuardedModel
 
 
-class MeetPlanQuerySet(models.QuerySet):
-    def available(self):
-        now = timezone.now()
-        return self.annotate(
-            available=Case(
-                When(start_time__gt=now, student__isnull=True, then=Value(True)),
-                output_field=models.BooleanField(),
-                default=Value(False),
-            ),
-        )
-
-
-class MeetPlan(models.Model):
+class MeetPlan(GuardedModel):
     teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="meet_plan")
     place = models.CharField(_("place"), max_length=100)
     start_time = models.DateTimeField(_("start time"))
@@ -32,8 +20,6 @@ class MeetPlan(models.Model):
     )
     s_message = models.TextField(_("student message"), blank=True)
     complete = models.BooleanField(_("status"), default=False)
-
-    objects = MeetPlanQuerySet.as_manager()
 
     class Meta:
         verbose_name = _("meet plan")

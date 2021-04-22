@@ -1,11 +1,52 @@
 from datetime import timedelta
 
-from django.test import TestCase
+from django.test import TestCase, Client
+from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
 from apps.meet_plan.models import MeetPlan
 from apps.user.models import User
+
+
+class AdminTest(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.client = Client()
+        cls.teacher = cls.admin = User.objects.create(
+            pku_id="2000000000",
+            name="admin",
+            address="admin office",
+            is_teacher=True,
+            is_admin=True,
+            is_superuser=True,
+        )
+        cls.student = User.objects.create(
+            pku_id="2000000001",
+            name="student",
+            email="student@pku.edu.cn",
+        )
+        now = timezone.now()
+        MeetPlan.objects.create(teacher=cls.teacher, place=cls.teacher.address, start_time=now, duration=1)
+        MeetPlan.objects.create(
+            teacher=cls.teacher, place=cls.teacher.address, start_time=now + timedelta(minutes=1), duration=1
+        )
+        MeetPlan.objects.create(
+            teacher=cls.teacher,
+            place=cls.teacher.address,
+            start_time=now + timedelta(hours=1),
+            duration=1,
+            student=cls.student,
+        )
+
+    def test_admin_page(self):
+        self.client.force_login(self.admin, backend="django.contrib.auth.backends.ModelBackend")
+        response = self.client.get(path=reverse("admin:meet_plan_meetplan_changelist"))
+        self.assertEqual(response.status_code, 200)
+        self.client.get(path=reverse("admin:meet_plan_meetplan_changelist"), data={"available": "yes"})
+        self.assertEqual(response.status_code, 200)
+        self.client.get(path=reverse("admin:meet_plan_meetplan_changelist"), data={"available": "no"})
+        self.assertEqual(response.status_code, 200)
 
 
 class ModelTest(TestCase):
@@ -44,24 +85,6 @@ class ModelTest(TestCase):
         self.assertTrue(meet_plan.is_available())
         meet_plan.student = self.student
         self.assertFalse(meet_plan.is_available())
-
-    def test_queryset(self):
-        now = timezone.now()
-        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now)
-        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now + timedelta(minutes=1))
-        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now, student=self.student)
-        mp4 = MeetPlan.objects.create(
-            teacher=self.teacher,
-            place=self.teacher.address,
-            start_time=now + timedelta(minutes=1),
-            student=self.student,
-        )
-        self.assertEqual(MeetPlan.objects.available().filter(available=True).count(), 1)
-        mp4.student = None
-        mp4.save()
-        self.assertEqual(MeetPlan.objects.available().filter(available=True).count(), 2)
-        with freeze_time(lambda: now + timedelta(minutes=1)):
-            self.assertEqual(MeetPlan.objects.available().filter(available=True).count(), 0)
 
     def test_save(self):
         now = timezone.now()

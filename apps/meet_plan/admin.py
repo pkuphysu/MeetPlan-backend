@@ -1,6 +1,9 @@
 from django.contrib import admin
 from django.contrib.admin import SimpleListFilter
+from django.db import models
+from django.db.models import Case, When, Value
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
@@ -20,11 +23,20 @@ class AvailableFilter(SimpleListFilter):
         )
 
     def queryset(self, request, queryset):
+        now = timezone.now()
+
+        queryset = queryset.annotate(
+            available=Case(
+                When(start_time__gt=now, student__isnull=True, then=Value(True)),
+                output_field=models.BooleanField(),
+                default=Value(False),
+            ),
+        )
         if self.value() == "yes":
-            return queryset.available().filter(available=True)
+            return queryset.filter(available=True)
 
         if self.value() == "no":
-            return queryset.available().filter(available=False)
+            return queryset.filter(available=False)
 
 
 @admin.register(MeetPlan)
