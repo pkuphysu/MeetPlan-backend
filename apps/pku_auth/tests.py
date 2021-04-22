@@ -1,8 +1,9 @@
 import json
-from datetime import datetime, timedelta
+from datetime import timedelta
 from unittest import mock
 
 from django.test import TestCase, override_settings
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from freezegun import freeze_time
 from graphene_django.utils.testing import GraphQLTestCase
@@ -276,7 +277,7 @@ class ApiTestWithJWT(GraphQLTestCase):
 
     def test_verify_token_expired(self):
         token = get_token(self.user)
-        with freeze_time(lambda: datetime.utcnow() + jwt_settings.JWT_EXPIRATION_DELTA + timedelta(seconds=1)):
+        with freeze_time(lambda: timezone.now() + jwt_settings.JWT_EXPIRATION_DELTA + timedelta(seconds=1)):
             response = self.query(
                 """
                 mutation myMutation($token: String!) {
