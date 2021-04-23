@@ -1,3 +1,4 @@
+# import json
 from datetime import timedelta
 
 from django.test import TestCase, Client
@@ -5,8 +6,13 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
-from apps.meet_plan.models import MeetPlan
+from apps.meet_plan.models import MeetPlan, TermDate
 from apps.user.models import User
+
+
+# from graphene_django.utils import GraphQLTestCase
+# from graphql_jwt.settings import jwt_settings
+# from graphql_jwt.shortcuts import get_token
 
 
 class AdminTest(TestCase):
@@ -85,6 +91,19 @@ class ModelTest(TestCase):
         self.assertTrue(meet_plan.is_available())
         meet_plan.student = self.student
         self.assertFalse(meet_plan.is_available())
+
+    def test_manager(self):
+        now = timezone.now()
+        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now - timedelta(days=366))
+        self.assertEqual(MeetPlan.objects.count(), 0)
+
+        TermDate.objects.create(start_date=timezone.now())
+        self.assertEqual(MeetPlan.objects.count(), 0)
+        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now)
+        self.assertEqual(MeetPlan.objects.count(), 0)
+        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now + timedelta(seconds=1))
+        self.assertEqual(MeetPlan.objects.count(), 1)
+        self.assertEqual(MeetPlan.objects.get_queryset(start_date=now - timedelta(days=366)).count(), 2)
 
     def test_save(self):
         now = timezone.now()
