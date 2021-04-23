@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from guardian.admin import GuardedModelAdmin
 
-from apps.meet_plan.models import MeetPlan
+from apps.meet_plan.models import MeetPlan, TermDate
 
 
 class AvailableFilter(SimpleListFilter):
@@ -78,3 +78,9 @@ class MeetPlanAdmin(GuardedModelAdmin):
         if obj.student:
             link = reverse("admin:user_user_change", args=[obj.student_id])
             return mark_safe(f'<a href="{link}">{escape(obj.student.pku_id)}</a>')
+
+
+@admin.register(TermDate)
+class TermDate(admin.ModelAdmin):
+    list_display = ["start_date"]
+    ordering = ["-id"]
