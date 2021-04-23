@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
 
-from apps.meet_plan.models import MeetPlan, TermDate
+from apps.meet_plan.models import MeetPlan, TermDate, get_start_date
 from apps.user.models import User
 
 
@@ -95,14 +95,19 @@ class ModelTest(TestCase):
     def test_manager(self):
         now = timezone.now()
         MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now - timedelta(days=366))
-        self.assertEqual(MeetPlan.objects.count(), 0)
+        self.assertEqual(MeetPlan.objects.count(), 1)
+        self.assertEqual(MeetPlan.objects.get_queryset(start_date=get_start_date()).count(), 0)
 
         TermDate.objects.create(start_date=timezone.now())
-        self.assertEqual(MeetPlan.objects.count(), 0)
-        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now)
-        self.assertEqual(MeetPlan.objects.count(), 0)
-        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now + timedelta(seconds=1))
+
         self.assertEqual(MeetPlan.objects.count(), 1)
+        self.assertEqual(MeetPlan.objects.get_queryset(start_date=get_start_date()).count(), 0)
+        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now)
+        self.assertEqual(MeetPlan.objects.count(), 2)
+        self.assertEqual(MeetPlan.objects.get_queryset(start_date=get_start_date()).count(), 0)
+        MeetPlan.objects.create(teacher=self.teacher, place=self.teacher.address, start_time=now + timedelta(seconds=1))
+        self.assertEqual(MeetPlan.objects.count(), 3)
+        self.assertEqual(MeetPlan.objects.get_queryset(start_date=get_start_date()).count(), 1)
         self.assertEqual(MeetPlan.objects.get_queryset(start_date=now - timedelta(days=366)).count(), 2)
 
     def test_save(self):

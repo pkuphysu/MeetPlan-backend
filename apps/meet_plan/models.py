@@ -22,8 +22,10 @@ def get_start_date():
 
 class MeetPlanManager(GuardedModelManager):
     def get_queryset(self, start_date=None):
-        start_date = start_date or get_start_date()
-        return super(MeetPlanManager, self).get_queryset().filter(start_time__gt=start_date)
+        if start_date is None:
+            return super(MeetPlanManager, self).get_queryset()
+        else:
+            return super(MeetPlanManager, self).get_queryset().filter(start_time__gt=start_date)
 
 
 class MeetPlan(GuardedModel):
