@@ -1,3 +1,7 @@
+from .query import (
+    OpenIDClientType,
+    Query,
+)
 from .mutation import (
     token_auth,
     ObtainJSONWebToken,
@@ -6,10 +10,6 @@ from .mutation import (
     Revoke,
     RevokeAll,
     Mutation,
-)
-from .query import (
-    OpenIDClientType,
-    Query,
 )
 
 __all__ = [

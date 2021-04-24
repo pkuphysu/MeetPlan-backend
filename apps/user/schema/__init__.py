@@ -1,3 +1,8 @@
+from .query import (
+    DepartmentType,
+    UserType,
+    Query,
+)
 from .mutation import (
     DepartmentCreate,
     DepartmentUpdate,
@@ -7,11 +12,6 @@ from .mutation import (
     UserUpdate,
     UserDelete,
     Mutation,
-)
-from .query import (
-    DepartmentType,
-    UserType,
-    Query,
 )
 
 __all__ = [
