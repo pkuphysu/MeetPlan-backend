@@ -2,13 +2,13 @@ import graphene
 from django.conf import settings
 from graphene_django.debug import DjangoDebug
 
-# import apps.meet_plan.schema
+import apps.meet_plan.schema
 import apps.pku_auth.schema
 import apps.user.schema
 
 
 class Query(
-    # apps.meet_plan.schema.Query,
+    apps.meet_plan.schema.Query,
     apps.user.schema.Query,
     apps.pku_auth.schema.Query,
     graphene.ObjectType,

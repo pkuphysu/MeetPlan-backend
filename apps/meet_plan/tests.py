@@ -1,18 +1,16 @@
-# import json
+import json
 from datetime import timedelta
 
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
 from freezegun import freeze_time
+from graphene_django.utils import GraphQLTestCase
+from graphql_jwt.settings import jwt_settings
+from graphql_jwt.shortcuts import get_token
 
 from apps.meet_plan.models import MeetPlan, TermDate, get_start_date
 from apps.user.models import User
-
-
-# from graphene_django.utils import GraphQLTestCase
-# from graphql_jwt.settings import jwt_settings
-# from graphql_jwt.shortcuts import get_token
 
 
 class AdminTest(TestCase):
@@ -129,3 +127,691 @@ class ModelTest(TestCase):
         self.assertTrue(mp.is_available())
         with freeze_time(lambda: now + timedelta(minutes=1)):
             self.assertFalse(mp.is_available())
+
+
+class QueryApiTest(GraphQLTestCase):
+    @staticmethod
+    def get_headers(user):
+        return {
+            jwt_settings.JWT_AUTH_HEADER_NAME: f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}",
+        }
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin = User.objects.create(pku_id="1999999999", name="admin", email="admin@pku.edu.cn", is_admin=True)
+        cls.student = User.objects.create(
+            pku_id="2000000000",
+            name="student",
+            email="student@pku.edu.cn",
+        )
+        cls.student2 = User.objects.create(
+            pku_id="2000000001",
+            name="student2",
+            email="student2@pku.edu.cn",
+        )
+        cls.teacher1 = User.objects.create(
+            pku_id="2000000002",
+            name="teacher",
+            email="teacher@pku.edu.cn",
+            address="teacher office",
+            is_teacher=True,
+        )
+        cls.teacher2 = User.objects.create(
+            pku_id="2000000003",
+            name="teacher2",
+            email="teacher2@pku.edu.cn",
+            address="teacher2 office",
+            is_teacher=True,
+        )
+        TermDate.objects.create(start_date=timezone.now())
+        MeetPlan.objects.create(
+            teacher=cls.teacher1,
+            place=cls.teacher1.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=1,
+            student=cls.student,
+            complete=False,
+        )
+        MeetPlan.objects.create(
+            teacher=cls.teacher2,
+            place=cls.teacher2.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=1,
+            student=cls.student2,
+            complete=True,
+        )
+        MeetPlan.objects.create(
+            teacher=cls.teacher1,
+            place=cls.teacher1.address,
+            start_time=timezone.now() - timedelta(hours=1),
+            duration=2,
+        )
+        MeetPlan.objects.create(
+            teacher=cls.teacher2,
+            place=cls.teacher2.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=3,
+        )
+
+    def test_ter_date_without_token(self):
+        response = self.query(
+            """
+            query{
+              termDate{
+                startDate
+              }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["termDate"]["startDate"], get_start_date().isoformat())
+
+    def test_meet_plans_without_token(self):
+        response = self.query(
+            """
+            {
+              meetPlans {
+                totalCount
+                edges {
+                  node {
+                    id
+                    pk
+                    teacher {
+                      id
+                      name
+                    }
+                    place
+                    startTime
+                    duration
+                    tMessage
+                    available
+                  }
+                }
+              }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        self.assertResponseHasErrors(response)
+        self.assertIsNone(content["data"]["meetPlans"])
+
+    def test_meet_plans_stu(self):
+        response = self.query(
+            """
+            {
+              meetPlans {
+                totalCount
+                edges {
+                  node {
+                    id
+                    pk
+                    teacher {
+                      id
+                      name
+                    }
+                    place
+                    startTime
+                    duration
+                    tMessage
+                    available
+                  }
+                }
+              }
+            }
+            """,
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlans"]["totalCount"], 4)
+        self.assertFalse(content["data"]["meetPlans"]["edges"][0]["node"]["available"])
+        self.assertFalse(content["data"]["meetPlans"]["edges"][1]["node"]["available"])
+        self.assertFalse(content["data"]["meetPlans"]["edges"][2]["node"]["available"])
+        self.assertTrue(content["data"]["meetPlans"]["edges"][3]["node"]["available"])
+
+        response = self.query(
+            """
+            {
+              meetPlans {
+                totalCount
+                edges {
+                  node {
+                    id
+                    pk
+                    teacher {
+                      id
+                      name
+                    }
+                    place
+                    startTime
+                    duration
+                    tMessage
+                    available
+                    student {
+                      id
+                      name
+                    }
+                    sMessage
+                    complete
+                  }
+                }
+              }
+            }
+            """,
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseHasErrors(response)
+        self.assertEqual(len(content["errors"]), 9)
+        self.assertIsNotNone(content["data"]["meetPlans"]["edges"][0]["node"]["student"])
+        self.assertIsNone(content["data"]["meetPlans"]["edges"][1]["node"]["student"])
+        self.assertIsNone(content["data"]["meetPlans"]["edges"][2]["node"]["student"])
+        self.assertIsNone(content["data"]["meetPlans"]["edges"][3]["node"]["student"])
+
+    def test_meet_plans_tea(self):
+        query_stat = """
+        {
+          meetPlans {
+            totalCount
+            edges {
+              node {
+                id
+                pk
+                teacher {
+                  id
+                  name
+                }
+                place
+                startTime
+                duration
+                tMessage
+                available
+                student {
+                  id
+                  pkuId
+                  name
+                }
+                sMessage
+                complete
+              }
+            }
+          }
+        }
+        """
+        response = self.query(query_stat, headers=self.get_headers(self.teacher1))
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlans"]["totalCount"], 2)
+        self.assertFalse(content["data"]["meetPlans"]["edges"][0]["node"]["available"])
+        self.assertFalse(content["data"]["meetPlans"]["edges"][1]["node"]["available"])
+
+        response = self.query(query_stat, headers=self.get_headers(self.teacher2))
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlans"]["totalCount"], 2)
+        self.assertFalse(content["data"]["meetPlans"]["edges"][0]["node"]["available"])
+        self.assertTrue(content["data"]["meetPlans"]["edges"][1]["node"]["available"])
+
+    def test_meet_plans_admin(self):
+        query_stat = """
+        {
+          meetPlans {
+            totalCount
+            edges {
+              node {
+                id
+                pk
+                teacher {
+                  id
+                  name
+                }
+                place
+                startTime
+                duration
+                tMessage
+                available
+                student {
+                  id
+                  pkuId
+                  name
+                  dateJoined
+                }
+                sMessage
+                complete
+              }
+            }
+          }
+        }
+        """
+        response = self.query(query_stat, headers=self.get_headers(self.admin))
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlans"]["totalCount"], 4)
+        self.assertFalse(content["data"]["meetPlans"]["edges"][0]["node"]["available"])
+        self.assertFalse(content["data"]["meetPlans"]["edges"][1]["node"]["available"])
+        self.assertFalse(content["data"]["meetPlans"]["edges"][2]["node"]["available"])
+        self.assertTrue(content["data"]["meetPlans"]["edges"][3]["node"]["available"])
+
+    def test_meet_plans_filter_teacher_id_exact(self):
+        for i in range(2, 7):
+            response = self.query(
+                """
+                query myQuery($id: Float!){
+                  meetPlans(teacher_Id: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(self.student),
+                variables={"id": i},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(content["data"]["meetPlans"]["totalCount"], MeetPlan.objects.filter(teacher_id=i).count())
+
+    def test_meet_plans_filter_teacher_id_in(self):
+        def test(id, count):
+            response = self.query(
+                """
+                query myQuery($id: [String]){
+                  meetPlans(teacher_Id_In: $id) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(self.student),
+                variables={"id": id},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(content["data"]["meetPlans"]["totalCount"], count)
+
+        test(["2"], MeetPlan.objects.filter(teacher_id__in=[2]).count())
+        test(["3"], MeetPlan.objects.filter(teacher_id__in=[3]).count())
+        test(["4"], MeetPlan.objects.filter(teacher_id__in=[4]).count())
+        test(["5"], MeetPlan.objects.filter(teacher_id__in=[5]).count())
+        test(["6"], MeetPlan.objects.filter(teacher_id__in=[6]).count())
+        test(["2", "3"], MeetPlan.objects.filter(teacher_id__in=[2, 3]).count())
+        test(["2", "5"], MeetPlan.objects.filter(teacher_id__in=[2, 5]).count())
+        test(["6", "5"], MeetPlan.objects.filter(teacher_id__in=[6, 5]).count())
+
+    def test_meet_plans_filter_start_time_lt(self):
+        def test(time):
+            response = self.query(
+                """
+                query myQuery($time: DateTime!){
+                  meetPlans(startTime_Lt: $time) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(self.student),
+                variables={"time": time.isoformat()},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"], MeetPlan.objects.filter(start_time__lt=time).count()
+            )
+
+        test(timezone.now())
+        test(timezone.now() - timedelta(hours=2))
+        test(get_start_date())
+
+    def test_meet_plans_filter_start_time_gt(self):
+        def test(time):
+            response = self.query(
+                """
+                query myQuery($time: DateTime!){
+                  meetPlans(startTime_Gt: $time) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(self.student),
+                variables={"time": time.isoformat()},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"], MeetPlan.objects.filter(start_time__gt=time).count()
+            )
+
+        test(timezone.now())
+        test(timezone.now() - timedelta(minutes=10))
+        test(timezone.now() - timedelta(hours=2))
+        test(get_start_date())
+
+    def test_meet_plans_filter_duration_exact(self):
+        def test(duration):
+            response = self.query(
+                """
+                query myQuery($duration: String!){
+                  meetPlans(duration: $duration) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(self.student),
+                variables={"duration": str(duration)},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"], MeetPlan.objects.filter(duration__exact=duration).count()
+            )
+
+        test(1)
+        test(2)
+        test(3)
+        test(4)
+
+    def test_meet_plans_filter_duration_in(self):
+        def test(duration):
+            response = self.query(
+                """
+                query myQuery($duration: [String]){
+                  meetPlans(duration_In: $duration) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(self.student),
+                variables={"duration": duration},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"], MeetPlan.objects.filter(duration__in=duration).count()
+            )
+
+        test(["1"])
+        test(["2"])
+        test(["3"])
+        test(["1", "4"])
+        test(["1", "3"])
+        test(["2", "3"])
+        test(["3", "4"])
+
+    def test_meet_plans_filter_student_pku_id_exact(self):
+        def test(pku_id, user):
+            response = self.query(
+                """
+                query myQuery($student_PkuId: String!){
+                  meetPlans(student_PkuId: $student_PkuId) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                        student {
+                          id
+                          pkuId
+                          name
+                          dateJoined
+                        }
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(user),
+                variables={"student_PkuId": pku_id},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"],
+                MeetPlan.objects.filter(student__pku_id__exact=pku_id).count(),
+            )
+
+        # TODO: when make this filter only for admin, uncomment next line
+        # test(self.student.pku_id, self.student)
+        # test(self.student2.pku_id, self.student2)
+        # test(self.student2.pku_id, self.student)
+        test(self.student.pku_id, self.admin)
+        test(self.student2.pku_id, self.admin)
+
+    def test_meet_plans_filter_student_pku_id_contains(self):
+        def test(pku_id, user):
+            response = self.query(
+                """
+                query myQuery($student_PkuId: String!){
+                  meetPlans(student_PkuId_Contains: $student_PkuId) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                        student {
+                          id
+                          pkuId
+                          name
+                          dateJoined
+                        }
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(user),
+                variables={"student_PkuId": pku_id},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"],
+                MeetPlan.objects.filter(student__pku_id__contains=pku_id).count(),
+            )
+
+        # TODO: when make this filter only for admin, uncomment next and fix them
+        # test("123123", self.student)
+        # test("123123", self.student2)
+        # test(self.student2.pku_id, self.student)
+        test("123123", self.admin)
+        test("20", self.admin)
+        test("000000000", self.admin)
+        test("000000001", self.admin)
+
+    def test_meet_plans_filter_student_pku_id_startswith(self):
+        def test(pku_id, user):
+            response = self.query(
+                """
+                query myQuery($student_PkuId: String!){
+                  meetPlans(student_PkuId_Contains: $student_PkuId) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                        student {
+                          id
+                          pkuId
+                          name
+                          dateJoined
+                        }
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(user),
+                variables={"student_PkuId": pku_id},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"],
+                MeetPlan.objects.filter(student__pku_id__startswith=pku_id).count(),
+            )
+
+        # TODO: when make this filter only for admin, uncomment next and fix them
+        # test("123123", self.student)
+        # test("123123", self.student2)
+        # test(self.student2.pku_id, self.student)
+        test("123123", self.admin)
+        test("20", self.admin)
+        test("19", self.admin)
+        test("2000000000", self.admin)
+
+    def test_meet_plans_filter_complete_exact(self):
+        def test(complete, user):
+            response = self.query(
+                """
+                query myQuery($complete: Boolean!){
+                  meetPlans(complete: $complete) {
+                    totalCount
+                    edges {
+                      node {
+                        id
+                        pk
+                        teacher {
+                          id
+                          name
+                        }
+                        place
+                        startTime
+                        duration
+                        tMessage
+                        available
+                        student {
+                          id
+                          pkuId
+                          name
+                          dateJoined
+                        }
+                        complete
+                      }
+                    }
+                  }
+                }
+                """,
+                headers=self.get_headers(user),
+                variables={"complete": complete},
+            )
+            content = json.loads(response.content)
+            self.assertResponseNoErrors(response)
+            self.assertEqual(
+                content["data"]["meetPlans"]["totalCount"], MeetPlan.objects.filter(complete__exact=complete).count()
+            )
+
+        test(True, self.admin)
+        test(False, self.admin)

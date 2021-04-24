@@ -62,7 +62,7 @@ class MeetPlan(GuardedModel):
         super().save(kwargs)
 
 
-class TermDate(models.Model):
+class TermDate(GuardedModel):
     start_date = models.DateTimeField(_("term start date"))
 
     class Meta:
