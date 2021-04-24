@@ -1,14 +1,13 @@
 import graphene
-from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from graphene import relay
 from graphene_django.filter import DjangoFilterConnectionField
-from graphene_django_plus.types import ModelType
 from graphene_django_plus.mutations import (
     ModelCreateMutation,
     ModelUpdateMutation,
     ModelDeleteMutation,
 )
+from graphene_django_plus.types import ModelType
 from graphql_jwt.exceptions import PermissionDenied
 
 from apps.pku_auth.meta import AbstractMeta, PKTypeMixin
@@ -185,17 +184,6 @@ class UserCreate(ModelCreateMutation):
         ]
         exclude_fields = ["password"]
 
-    @classmethod
-    def clean_instance(cls, instance, clean_input):
-        # TODO: when https://github.com/0soft/graphene-django-plus/pull/22 is merged, delete this func
-        try:
-            instance.full_clean(exclude=cls._meta.exclude_fields)
-        except ValidationError as e:
-            if e.error_dict:
-                raise e
-
-        return instance
-
 
 class UserUpdate(ModelUpdateMutation):
     class Meta:
@@ -217,17 +205,6 @@ class UserUpdate(ModelUpdateMutation):
             "user_permissions",
         ]
         exclude_fields = ["password"]
-
-    @classmethod
-    def clean_instance(cls, instance, clean_input):
-        # TODO: when https://github.com/0soft/graphene-django-plus/pull/22 is merged, delete this func
-        try:
-            instance.full_clean(exclude=cls._meta.exclude_fields)
-        except ValidationError as e:
-            if e.error_dict:
-                raise e
-
-        return instance
 
 
 class UserDelete(ModelDeleteMutation):
