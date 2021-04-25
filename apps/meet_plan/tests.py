@@ -8,6 +8,7 @@ from freezegun import freeze_time
 from graphene_django.utils import GraphQLTestCase
 from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
+from guardian.shortcuts import assign_perm
 
 from apps.meet_plan.models import MeetPlan, TermDate, get_start_date
 from apps.user.models import User
@@ -193,7 +194,7 @@ class QueryApiTest(GraphQLTestCase):
             duration=3,
         )
 
-    def test_ter_date_without_token(self):
+    def test_term_date_without_token(self):
         response = self.query(
             """
             query{
@@ -815,3 +816,89 @@ class QueryApiTest(GraphQLTestCase):
 
         test(True, self.admin)
         test(False, self.admin)
+
+
+class MutationApiTest(GraphQLTestCase):
+    @staticmethod
+    def get_headers(user):
+        return {
+            jwt_settings.JWT_AUTH_HEADER_NAME: f"{jwt_settings.JWT_AUTH_HEADER_PREFIX} {get_token(user)}",
+        }
+
+    @classmethod
+    def setUpTestData(cls):
+        cls.admin = User.objects.create(pku_id="1999999999", name="admin", email="admin@pku.edu.cn", is_admin=True)
+        assign_perm("meet_plan.add_termdate", cls.admin)
+        cls.student = User.objects.create(
+            pku_id="2000000000",
+            name="student",
+            email="student@pku.edu.cn",
+        )
+        cls.teacher = User.objects.create(
+            pku_id="2000000001",
+            name="teacher",
+            email="teacher@pku.edu.cn",
+            address="teacher office",
+            is_teacher=True,
+        )
+        TermDate.objects.create(start_date=timezone.now())
+
+    def test_term_date_update(self):
+        response = self.query(
+            """
+            query{
+              termDate{
+                startDate
+              }
+            }
+            """
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["termDate"]["startDate"], TermDate.objects.last().start_date.isoformat())
+        now = timezone.now()
+        response = self.query(
+            """
+            mutation myMutation($input: TermDateCreateInput!){
+              termDateUpdate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                termDate {
+                  id
+                  startDate
+                }
+              }
+            }
+            """,
+            input_data={"clientMutationId": "without token", "startDate": now.isoformat()},
+        )
+        self.assertResponseHasErrors(response)
+
+        response = self.query(
+            """
+            mutation myMutation($input: TermDateCreateInput!){
+              termDateUpdate(input: $input){
+                errors{
+                  field
+                  message
+                }
+                clientMutationId
+                termDate {
+                  id
+                  startDate
+                }
+              }
+            }
+            """,
+            headers=self.get_headers(self.admin),
+            input_data={"clientMutationId": "with token", "startDate": now.isoformat()},
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["termDateUpdate"]["termDate"]["startDate"], now.isoformat())
+
+    def test_meet_plan_create(self):
+        pass

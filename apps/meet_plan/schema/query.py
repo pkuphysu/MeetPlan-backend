@@ -4,13 +4,16 @@ from graphene_django.filter import DjangoFilterConnectionField
 from graphene_django_plus.types import ModelType
 from graphql_jwt.exceptions import PermissionDenied
 
-from apps.meet_plan.models import MeetPlan, get_start_date
+from apps.meet_plan.models import MeetPlan, TermDate
 from apps.pku_auth.meta import PKTypeMixin, AbstractMeta
 from apps.user.schema import UserType
 
 
-class TermDateType(graphene.ObjectType):
-    start_date = graphene.DateTime()
+class TermDateType(ModelType):
+    class Meta(AbstractMeta):
+        model = TermDate
+        fields = ["start_date"]
+        allow_unauthenticated = True
 
 
 class MeetPlanType(PKTypeMixin, ModelType):
@@ -97,7 +100,7 @@ class Query(graphene.ObjectType):
 
     @staticmethod
     def resolve_term_date(parent, info):
-        return TermDateType(start_date=get_start_date())
+        return TermDate.objects.last()
 
     meet_plan = relay.Node.Field(MeetPlanType)
     meet_plans = DjangoFilterConnectionField(MeetPlanType)
