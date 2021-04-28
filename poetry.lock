@@ -395,7 +395,7 @@ python-versions = "*"
 
 [[package]]
 name = "graphene-django-plus"
-version = "2.4.0"
+version = "2.4.1"
 description = "Tools to easily create permissioned CRUD endpoints in graphene."
 category = "main"
 optional = false
@@ -775,7 +775,7 @@ pgsql = ["psycopg2"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "eaef98d42f3e4ea0a0fa2fe4d5b22911f03ec2b10c36ff603c496291e9b42852"
+content-hash = "bfa2f487b78accfdfe14d30878ce91e921c4a6d7e78504a8433e3a4ab8f15a9d"
 
 [metadata.files]
 amqp = [
@@ -947,8 +947,8 @@ graphene-django-optimizer = [
     {file = "graphene-django-optimizer-0.8.0.tar.gz", hash = "sha256:79269880d59d0a35d41751ddcb419220c4ad3871960416371119f447cb2e1a77"},
 ]
 graphene-django-plus = [
-    {file = "graphene-django-plus-2.4.0.tar.gz", hash = "sha256:6ee492f824be9e98e3ffd70526b8d83b8e56ff397c8ae8c365993a6da83f538e"},
-    {file = "graphene_django_plus-2.4.0-py3-none-any.whl", hash = "sha256:826afdee73f2e4f2d74c9e6c50eacd86d315f045d10ebe0e36df9e857a8792ca"},
+    {file = "graphene-django-plus-2.4.1.tar.gz", hash = "sha256:772da17523312dd604a52bde9aab3dbd84b8eb55faa66c6c7a6c4de4100d7868"},
+    {file = "graphene_django_plus-2.4.1-py3-none-any.whl", hash = "sha256:83b4f843b5044c33211d177bcae5d5f98161b501a53c5057cef74656b353db49"},
 ]
 graphql-core = [
     {file = "graphql-core-3.1.4.tar.gz", hash = "sha256:972eff18416ad90815c95914b754486270f13fbe1a24e010c7eedbaa903b9386"},
