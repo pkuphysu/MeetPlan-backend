@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-22 02:28+0800\n"
+"POT-Creation-Date: 2021-04-30 00:36+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,23 +18,35 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
-#: apps/meet_plan/admin.py:28
+#: apps/meet_plan/admin.py:16 apps/meet_plan/admin.py:58
+msgid "available"
+msgstr "可选"
+
+#: apps/meet_plan/admin.py:21
+msgid "Yes"
+msgstr "是"
+
+#: apps/meet_plan/admin.py:22
+msgid "No"
+msgstr "否"
+
+#: apps/meet_plan/admin.py:62
 msgid "Teacher Name"
 msgstr "教师名字"
 
-#: apps/meet_plan/admin.py:33
+#: apps/meet_plan/admin.py:66
 msgid "Teacher PKU ID"
 msgstr "教师职工号"
 
-#: apps/meet_plan/admin.py:38 apps/meet_plan/admin.py:44
+#: apps/meet_plan/admin.py:71 apps/meet_plan/admin.py:76
 msgid "None"
 msgstr "无"
 
-#: apps/meet_plan/admin.py:38
+#: apps/meet_plan/admin.py:71
 msgid "Student Name"
 msgstr "学生名字"
 
-#: apps/meet_plan/admin.py:44
+#: apps/meet_plan/admin.py:76
 msgid "Student PKU ID"
 msgstr "学生学号"
 
@@ -42,65 +54,111 @@ msgstr "学生学号"
 msgid "Meet plan"
 msgstr "综合指导课"
 
-#: apps/meet_plan/models.py:8
+#: apps/meet_plan/models.py:33
 msgid "place"
 msgstr "地点"
 
-#: apps/meet_plan/models.py:9
+#: apps/meet_plan/models.py:34
 msgid "start time"
 msgstr "开始时间"
 
-#: apps/meet_plan/models.py:11
+#: apps/meet_plan/models.py:36
 msgid "duration"
 msgstr "时长"
 
-#: apps/meet_plan/models.py:12
+#: apps/meet_plan/models.py:37
 msgid "half an hour"
 msgstr "半小时"
 
-#: apps/meet_plan/models.py:12
+#: apps/meet_plan/models.py:37
 msgid "an hour"
 msgstr "一小时"
 
-#: apps/meet_plan/models.py:12
+#: apps/meet_plan/models.py:37
 msgid "an hour and a half"
 msgstr "一个半小时"
 
-#: apps/meet_plan/models.py:12
+#: apps/meet_plan/models.py:37
 msgid "two hours"
 msgstr "两小时"
 
-#: apps/meet_plan/models.py:14
+#: apps/meet_plan/models.py:40
 msgid "teacher message"
 msgstr "教师备注"
 
-#: apps/meet_plan/models.py:15
-msgid "available"
-msgstr "可选"
-
-#: apps/meet_plan/models.py:19
+#: apps/meet_plan/models.py:44
 msgid "student message"
 msgstr "学生留言"
 
-#: apps/meet_plan/models.py:20
+#: apps/meet_plan/models.py:45
 msgid "status"
 msgstr "状态"
 
-#: apps/meet_plan/models.py:23
+#: apps/meet_plan/models.py:50
 msgid "meet plan"
 msgstr "综合指导课"
 
-#: apps/meet_plan/models.py:24
+#: apps/meet_plan/models.py:51
 msgid "meet plans"
 msgstr "综合指导课"
 
-#: apps/meet_plan/models.py:25
-msgid "Can edit meet plan."
-msgstr "可以编辑综合指导课。"
+#: apps/meet_plan/models.py:65
+msgid "term start date"
+msgstr "学期开始时间"
 
-#: apps/meet_plan/models.py:25
-msgid "Can delete meet plan order."
-msgstr "可以删除综合指导课预约。"
+#: apps/meet_plan/models.py:68
+msgid "term date"
+msgstr "学期时间"
+
+#: apps/meet_plan/schema/mutation.py:39 apps/meet_plan/schema/mutation.py:42
+msgid "You can only create your own meet plan."
+msgstr "你只能创建自己的安排。"
+
+#: apps/meet_plan/schema/mutation.py:44
+msgid "You can only create the previous plan."
+msgstr "你只能补录之前的预约。"
+
+#: apps/meet_plan/schema/mutation.py:47
+msgid "You can only create incomplete plan and ask the teacher to confirm it."
+msgstr "你只能补录未确认的预约，然后让谈话老师确认此次记录。"
+
+#: apps/meet_plan/schema/mutation.py:69
+msgid "You can not update the teacher field."
+msgstr "你不能修改教师字段。"
+
+#: apps/meet_plan/schema/mutation.py:79
+msgid "You can not modify meet plan details."
+msgstr "你不能修改安排信息。"
+
+#: apps/meet_plan/schema/mutation.py:83
+msgid "You can not modify this."
+msgstr "你不能修改这个。"
+
+#: apps/meet_plan/schema/mutation.py:88
+msgid ""
+"You can not delete your order, please connect the teacher using email or "
+"phone."
+msgstr "你不能删除你的预约，请用邮件或电话联系老师取消预约。"
+
+#: apps/meet_plan/schema/mutation.py:97
+msgid "You can not change student field to other student."
+msgstr "你不能将预约人改成其他同学。"
+
+#: apps/meet_plan/schema/mutation.py:101
+msgid "You can not make order for other student."
+msgstr "你不能为其他同学创建预约。"
+
+#: apps/meet_plan/schema/mutation.py:105
+msgid "You can not change complete field."
+msgstr "你不能修改complete字段。"
+
+#: apps/meet_plan/schema/mutation.py:116
+msgid "You can only update your own meet plan."
+msgstr "你只能更新自己的预约。"
+
+#: apps/meet_plan/schema/mutation.py:120
+msgid "You can not change previous plan."
+msgstr "你不能修改之前的预约。"
 
 #: apps/pku_auth/apps.py:8
 msgid "Openid Client"
@@ -142,9 +200,13 @@ msgstr "OpenID 应用"
 msgid "OpenID Clients"
 msgstr "OpenID 应用"
 
-#: apps/pku_auth/schema.py:42
+#: apps/pku_auth/schema/mutation.py:34
 msgid "Please enter valid credentials"
 msgstr "请输入有效的凭证"
+
+#: apps/pku_auth/tests.py:294
+msgid "Signature has expired"
+msgstr "签名已过期"
 
 #: apps/user/admin.py:38
 msgid "Personal info"
@@ -230,17 +292,18 @@ msgstr "管理员状态"
 msgid "Admin user can manage this site."
 msgstr "管理员可以管理这个站点。"
 
-#: apps/user/schema.py:56
+#: apps/user/schema/mutation.py:50
+msgid "This api only allow update yourself."
+msgstr "这个 api 只允许更新你自己。"
+
+#: apps/user/schema/query.py:50
 msgid "Only allow user query himself or teacher query student on this field."
 msgstr "此字段仅允许用户查询自己或教师查询学生"
 
-#: apps/user/schema.py:69 apps/user/schema.py:79 apps/user/schema.py:89
+#: apps/user/schema/query.py:63 apps/user/schema/query.py:73
+#: apps/user/schema/query.py:83
 msgid "Only allow user query himself on this field."
 msgstr "此字段仅允许用户查询自己。"
-
-#: apps/user/schema.py:163
-msgid "This api only allow update yourself."
-msgstr "这个 api 只允许更新你自己。"
 
 #: apps/user/validators.py:9
 msgid "Enter a valid pku id. This value may contain only numbers."
