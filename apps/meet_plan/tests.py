@@ -8,10 +8,12 @@ from freezegun import freeze_time
 from graphene_django.utils import GraphQLTestCase
 from graphql_jwt.settings import jwt_settings
 from graphql_jwt.shortcuts import get_token
+from graphql_relay import to_global_id
 from guardian.shortcuts import assign_perm
 
 from apps.meet_plan.models import MeetPlan, TermDate, get_start_date
 from apps.user.models import User
+from apps.user.schema import UserType
 
 
 class AdminTest(TestCase):
@@ -900,5 +902,378 @@ class MutationApiTest(GraphQLTestCase):
         self.assertResponseNoErrors(response)
         self.assertEqual(content["data"]["termDateUpdate"]["termDate"]["startDate"], now.isoformat())
 
-    def test_meet_plan_create(self):
-        pass
+    def test_meet_plan_create_admin(self):
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+            },
+            headers=self.get_headers(self.admin),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        mt = MeetPlan.objects.get(pk=content["data"]["meetPlanCreate"]["meetPlan"]["pk"])
+        self.assertTrue(self.teacher.has_perms(["meet_plan.change_meetplan", "meet_plan.delete_meetplan"], mt))
+
+    def test_meet_plan_create_teacher(self):
+        teacher = User.objects.create(
+            pku_id="2000000002",
+            name="teacher2",
+            email="teacher2@pku.edu.cn",
+            address="teacher2 office",
+            is_teacher=True,
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+            },
+            headers=self.get_headers(self.teacher),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        mt = MeetPlan.objects.get(pk=content["data"]["meetPlanCreate"]["meetPlan"]["pk"])
+        self.assertTrue(self.teacher.has_perms(["meet_plan.change_meetplan", "meet_plan.delete_meetplan"], mt))
+
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+            },
+            headers=self.get_headers(teacher),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanCreate"]["errors"], [])
+
+    def test_meet_plan_create_student(self):
+        student = User.objects.create(
+            pku_id="2000000002",
+            name="student2",
+            email="student2@pku.edu.cn",
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanCreate"]["errors"], [])
+
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+                "student": to_global_id(UserType._meta.name, str(student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanCreate"]["errors"], [])
+
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": (timezone.now() + timedelta(minutes=1)).isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanCreate"]["errors"], [])
+
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+                "complete": True,
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanCreate"]["errors"], [])
+
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanCreateInput!){
+              meetPlanCreate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "teacher": to_global_id(UserType._meta.name, str(self.teacher.id)),
+                "place": self.teacher.address,
+                "startTime": timezone.now().isoformat(),
+                "duration": 1,
+                "tMessage": "test meet plan",
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlanCreate"]["errors"], [])
+        mt = MeetPlan.objects.get(pk=content["data"]["meetPlanCreate"]["meetPlan"]["pk"])
+        self.assertTrue(self.teacher.has_perms(["meet_plan.change_meetplan", "meet_plan.delete_meetplan"], mt))

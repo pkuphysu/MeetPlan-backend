@@ -49,7 +49,6 @@ class MeetPlan(GuardedModel):
     class Meta:
         verbose_name = _("meet plan")
         verbose_name_plural = _("meet plans")
-        permissions = [("edit_plan", _("Can edit meet plan.")), ("delete_order", _("Can delete meet plan order."))]
 
     def is_available(self):
         now = timezone.now()
