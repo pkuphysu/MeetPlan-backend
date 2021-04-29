@@ -68,7 +68,7 @@ python-versions = "*"
 
 [[package]]
 name = "black"
-version = "21.4b0"
+version = "21.4b2"
 description = "The uncompromising code formatter."
 category = "dev"
 optional = false
@@ -78,7 +78,7 @@ python-versions = ">=3.6.2"
 appdirs = "*"
 click = ">=7.1.2"
 mypy-extensions = ">=0.4.3"
-pathspec = ">=0.6,<1"
+pathspec = ">=0.8.1,<1"
 regex = ">=2020.1.8"
 toml = ">=0.10.1"
 
@@ -395,7 +395,7 @@ python-versions = "*"
 
 [[package]]
 name = "graphene-django-plus"
-version = "2.4.0"
+version = "2.4.1"
 description = "Tools to easily create permissioned CRUD endpoints in graphene."
 category = "main"
 optional = false
@@ -576,7 +576,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [[package]]
 name = "pyjwt"
-version = "2.0.1"
+version = "2.1.0"
 description = "JSON Web Token implementation in Python"
 category = "main"
 optional = false
@@ -807,8 +807,8 @@ billiard = [
     {file = "billiard-3.6.4.0.tar.gz", hash = "sha256:299de5a8da28a783d51b197d496bef4f1595dd023a93a4f59dde1886ae905547"},
 ]
 black = [
-    {file = "black-21.4b0-py3-none-any.whl", hash = "sha256:2db7040bbbbaa46247bfcc05c6efdebd7ebe50c1c3ca745ca6e0f6776438c96c"},
-    {file = "black-21.4b0.tar.gz", hash = "sha256:915d916c48646dbe8040d5265cff7111421a60a3dfe7f7e07273176a57c24a34"},
+    {file = "black-21.4b2-py3-none-any.whl", hash = "sha256:bff7067d8bc25eb21dcfdbc8c72f2baafd9ec6de4663241a52fb904b304d391f"},
+    {file = "black-21.4b2.tar.gz", hash = "sha256:fc9bcf3b482b05c1f35f6a882c079dc01b9c7795827532f4cc43c0ec88067bbc"},
 ]
 celery = [
     {file = "celery-5.0.5-py3-none-any.whl", hash = "sha256:5e8d364e058554e83bbb116e8377d90c79be254785f357cb2cec026e79febe13"},
@@ -947,8 +947,8 @@ graphene-django-optimizer = [
     {file = "graphene-django-optimizer-0.8.0.tar.gz", hash = "sha256:79269880d59d0a35d41751ddcb419220c4ad3871960416371119f447cb2e1a77"},
 ]
 graphene-django-plus = [
-    {file = "graphene-django-plus-2.4.0.tar.gz", hash = "sha256:6ee492f824be9e98e3ffd70526b8d83b8e56ff397c8ae8c365993a6da83f538e"},
-    {file = "graphene_django_plus-2.4.0-py3-none-any.whl", hash = "sha256:826afdee73f2e4f2d74c9e6c50eacd86d315f045d10ebe0e36df9e857a8792ca"},
+    {file = "graphene-django-plus-2.4.1.tar.gz", hash = "sha256:772da17523312dd604a52bde9aab3dbd84b8eb55faa66c6c7a6c4de4100d7868"},
+    {file = "graphene_django_plus-2.4.1-py3-none-any.whl", hash = "sha256:83b4f843b5044c33211d177bcae5d5f98161b501a53c5057cef74656b353db49"},
 ]
 graphql-core = [
     {file = "graphql-core-3.1.4.tar.gz", hash = "sha256:972eff18416ad90815c95914b754486270f13fbe1a24e010c7eedbaa903b9386"},
@@ -1034,8 +1034,8 @@ pyflakes = [
     {file = "pyflakes-2.3.1.tar.gz", hash = "sha256:f5bc8ecabc05bb9d291eb5203d6810b49040f6ff446a756326104746cc00c1db"},
 ]
 pyjwt = [
-    {file = "PyJWT-2.0.1-py3-none-any.whl", hash = "sha256:b70b15f89dc69b993d8a8d32c299032d5355c82f9b5b7e851d1a6d706dffe847"},
-    {file = "PyJWT-2.0.1.tar.gz", hash = "sha256:a5c70a06e1f33d81ef25eecd50d50bd30e34de1ca8b2b9fa3fe0daaabcf69bf7"},
+    {file = "PyJWT-2.1.0-py3-none-any.whl", hash = "sha256:934d73fbba91b0483d3857d1aff50e96b2a892384ee2c17417ed3203f173fca1"},
+    {file = "PyJWT-2.1.0.tar.gz", hash = "sha256:fba44e7898bbca160a2b2b501f492824fc8382485d3a6f11ba5d0c1937ce6130"},
 ]
 pyparsing = [
     {file = "pyparsing-2.4.7-py2.py3-none-any.whl", hash = "sha256:ef9d7589ef3c200abe66653d3f1ab1033c3c419ae9b9bdb1240a85b024efc88b"},
