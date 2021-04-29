@@ -1630,3 +1630,183 @@ class MutationApiTest(GraphQLTestCase):
         content = json.loads(response.content)
         self.assertResponseNoErrors(response)
         self.assertEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+    def test_meet_plan_delete_admin(self):
+        mt = MeetPlan.objects.create(
+            teacher=self.teacher,
+            place=self.teacher.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=1,
+            student=self.student,
+            complete=True,
+        )
+
+        query_str = """
+            mutation myMutation($input: MeetPlanDeleteInput!){
+              meetPlanDelete(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
+            headers=self.get_headers(self.admin),
+        )
+        self.assertResponseHasErrors(response)
+        self.assertEqual(MeetPlan.objects.all().count(), 1)
+
+        mt.student = None
+        mt.save()
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
+            headers=self.get_headers(self.admin),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlanDelete"]["errors"], [])
+        self.assertEqual(MeetPlan.objects.all().count(), 0)
+
+    def test_meet_plan_delete_teacher(self):
+        mt = MeetPlan.objects.create(
+            teacher=self.teacher,
+            place=self.teacher.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=1,
+            student=self.student,
+            complete=True,
+        )
+
+        query_str = """
+            mutation myMutation($input: MeetPlanDeleteInput!){
+              meetPlanDelete(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
+            headers=self.get_headers(self.teacher),
+        )
+        self.assertResponseHasErrors(response)
+        self.assertEqual(MeetPlan.objects.all().count(), 1)
+
+        mt.student = None
+        mt.save()
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
+            headers=self.get_headers(self.teacher),
+        )
+        self.assertResponseHasErrors(response)
+        self.assertEqual(MeetPlan.objects.all().count(), 1)
+
+        assign_perm("meet_plan.delete_meetplan", self.teacher, mt)
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
+            headers=self.get_headers(self.teacher),
+        )
+        self.assertResponseNoErrors(response)
+        self.assertEqual(MeetPlan.objects.all().count(), 0)
+
+    def test_meet_plan_delete_student(self):
+        mt = MeetPlan.objects.create(
+            teacher=self.teacher,
+            place=self.teacher.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=1,
+            student=self.student,
+            complete=True,
+        )
+
+        query_str = """
+            mutation myMutation($input: MeetPlanDeleteInput!){
+              meetPlanDelete(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
+            headers=self.get_headers(self.student),
+        )
+        self.assertResponseHasErrors(response)
+        self.assertEqual(MeetPlan.objects.all().count(), 1)

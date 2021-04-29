@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-04-30 00:36+0800\n"
+"POT-Creation-Date: 2021-04-30 01:01+0800\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -110,55 +110,59 @@ msgstr "学期开始时间"
 msgid "term date"
 msgstr "学期时间"
 
-#: apps/meet_plan/schema/mutation.py:39 apps/meet_plan/schema/mutation.py:42
+#: apps/meet_plan/schema/mutation.py:40 apps/meet_plan/schema/mutation.py:43
 msgid "You can only create your own meet plan."
 msgstr "你只能创建自己的安排。"
 
-#: apps/meet_plan/schema/mutation.py:44
+#: apps/meet_plan/schema/mutation.py:45
 msgid "You can only create the previous plan."
 msgstr "你只能补录之前的预约。"
 
-#: apps/meet_plan/schema/mutation.py:47
+#: apps/meet_plan/schema/mutation.py:48
 msgid "You can only create incomplete plan and ask the teacher to confirm it."
 msgstr "你只能补录未确认的预约，然后让谈话老师确认此次记录。"
 
-#: apps/meet_plan/schema/mutation.py:69
+#: apps/meet_plan/schema/mutation.py:70
 msgid "You can not update the teacher field."
 msgstr "你不能修改教师字段。"
 
-#: apps/meet_plan/schema/mutation.py:79
+#: apps/meet_plan/schema/mutation.py:80
 msgid "You can not modify meet plan details."
 msgstr "你不能修改安排信息。"
 
-#: apps/meet_plan/schema/mutation.py:83
+#: apps/meet_plan/schema/mutation.py:84
 msgid "You can not modify this."
 msgstr "你不能修改这个。"
 
-#: apps/meet_plan/schema/mutation.py:88
+#: apps/meet_plan/schema/mutation.py:89
 msgid ""
 "You can not delete your order, please connect the teacher using email or "
 "phone."
 msgstr "你不能删除你的预约，请用邮件或电话联系老师取消预约。"
 
-#: apps/meet_plan/schema/mutation.py:97
+#: apps/meet_plan/schema/mutation.py:98
 msgid "You can not change student field to other student."
 msgstr "你不能将预约人改成其他同学。"
 
-#: apps/meet_plan/schema/mutation.py:101
+#: apps/meet_plan/schema/mutation.py:102
 msgid "You can not make order for other student."
 msgstr "你不能为其他同学创建预约。"
 
-#: apps/meet_plan/schema/mutation.py:105
+#: apps/meet_plan/schema/mutation.py:106
 msgid "You can not change complete field."
 msgstr "你不能修改complete字段。"
 
-#: apps/meet_plan/schema/mutation.py:116
+#: apps/meet_plan/schema/mutation.py:117
 msgid "You can only update your own meet plan."
 msgstr "你只能更新自己的预约。"
 
-#: apps/meet_plan/schema/mutation.py:120
+#: apps/meet_plan/schema/mutation.py:121
 msgid "You can not change previous plan."
 msgstr "你不能修改之前的预约。"
+
+#: apps/meet_plan/schema/mutation.py:140
+msgid "This plan should not be deleted as it is completed!"
+msgstr "这个安排不能被删除因为它已经完成！"
 
 #: apps/pku_auth/apps.py:8
 msgid "Openid Client"

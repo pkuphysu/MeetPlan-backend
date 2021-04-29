@@ -2,6 +2,7 @@ import graphene
 from django.core.exceptions import ValidationError
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
+from graphene_django_plus.exceptions import PermissionDenied
 from graphene_django_plus.mutations import ModelCreateMutation, ModelUpdateMutation, ModelDeleteMutation
 from guardian.shortcuts import assign_perm
 
@@ -123,7 +124,21 @@ class MeetPlanUpdate(ModelUpdateMutation):
 class MeetPlanDelete(ModelDeleteMutation):
     class Meta:
         model = MeetPlan
-        obj_permissions = ["meet_plan.delete_meetplan"]
+
+    @classmethod
+    def get_instance(cls, info, obj_id):
+        instance = super().get_instance(info, obj_id)
+        user = info.context.user
+        if user.is_admin:
+            pass
+        elif user.is_teacher:
+            if not user.has_perm("meet_plan.delete_meetplan", instance):
+                raise PermissionDenied()
+        else:
+            raise PermissionDenied()
+        if instance.student and instance.complete:
+            raise PermissionDenied(message=_("This plan should not be deleted as it is completed!"))
+        return instance
 
 
 class Mutation(graphene.ObjectType):
