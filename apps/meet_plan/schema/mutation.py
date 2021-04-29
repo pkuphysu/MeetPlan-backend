@@ -36,15 +36,15 @@ class MeetPlanCreate(ModelCreateMutation):
             pass
         elif user.is_teacher:
             if user.id != instance.teacher_id:
-                raise ValidationError({"teacher": _("You can only create your own meet plan!")})
+                raise ValidationError({"teacher": _("You can only create your own meet plan.")})
         else:
             if instance.student_id is None or user.id != instance.student_id:
-                raise ValidationError({"student": _("You can only create your own meet plan!")})
+                raise ValidationError({"student": _("You can only create your own meet plan.")})
             if instance.start_time > timezone.now():
-                raise ValidationError({"start_time": _("You can only create the previous plan!")})
+                raise ValidationError({"start_time": _("You can only create the previous plan.")})
             if instance.complete:
                 raise ValidationError(
-                    {"complete": _("You can only create incomplete plan and ask the teacher to confirm it!")}
+                    {"complete": _("You can only create incomplete plan and ask the teacher to confirm it.")}
                 )
 
     @classmethod
@@ -56,6 +56,68 @@ class MeetPlanCreate(ModelCreateMutation):
 class MeetPlanUpdate(ModelUpdateMutation):
     class Meta:
         model = MeetPlan
+
+    @classmethod
+    def clean_input(cls, info, instance, data):
+        cleaned_input = super().clean_input(info, instance, data)
+        user = info.context.user
+        if user.is_admin:
+            pass
+        elif user.is_teacher:
+            if "teacher" in cleaned_input and cleaned_input["teacher"].id != user.id:
+                # 教师只能修改自己的安排
+                raise ValidationError({"teacher": _("You can not update the teacher field.")})
+        else:
+            if (
+                ("teacher" in cleaned_input and cleaned_input["teacher"].id != instance.teacher_id)
+                or ("start_time" in cleaned_input and cleaned_input["start_time"] != instance.start_time)
+                or ("place" in cleaned_input and cleaned_input["place"] != instance.place)
+                or ("duration" in cleaned_input and cleaned_input["duration"] != instance.duration)
+                or ("t_message" in cleaned_input and cleaned_input["t_message"] != instance.t_message)
+            ):
+                # 学生不能修改安排信息
+                raise ValidationError({"meet_plan": _("You can not modify meet plan details.")})
+
+            if instance.student_id is not None and user.id != instance.student_id:
+                # 学生不能修改他人的预约信息
+                raise ValidationError({"student": _("You can not modify this.")})
+
+            if instance.student_id is not None and "student" in cleaned_input and cleaned_input["student"] is None:
+                # 不允许学生自己取消预约
+                raise ValidationError(
+                    {"student": _("You can not delete your order, please connect the teacher using email or phone.")}
+                )
+
+            if (
+                instance.student_id is not None
+                and "student" in cleaned_input
+                and user.id != cleaned_input["student"].id
+            ):
+                # 不允许学生将预约信息改成其他人
+                raise ValidationError({"student": _("You can not change student field to other student.")})
+
+            if "student" in cleaned_input and user.id != cleaned_input["student"].id:
+                # 学生不能帮他人预约信息
+                raise ValidationError({"student": _("You can not make order for other student.")})
+
+            if "complete" in cleaned_input and cleaned_input["complete"] and not instance.complete:
+                # 学生不能标记预约为已完成
+                raise ValidationError({"complete": _("You can not change complete field.")})
+
+        return cleaned_input
+
+    @classmethod
+    def before_save(cls, info, instance, cleaned_input=None):
+        user = info.context.user
+        if user.is_admin:
+            pass
+        elif user.is_teacher:
+            if not user.has_perm("meet_plan.change_meetplan", instance):
+                raise ValidationError({"teacher": _("You can only update your own meet plan.")})
+        else:
+            if instance.start_time < timezone.now():
+                # 学生不能修改之前的预约信息
+                raise ValidationError({"start_time": _("You can not change previous plan.")})
 
 
 class MeetPlanDelete(ModelDeleteMutation):

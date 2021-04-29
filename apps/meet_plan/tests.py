@@ -12,6 +12,7 @@ from graphql_relay import to_global_id
 from guardian.shortcuts import assign_perm
 
 from apps.meet_plan.models import MeetPlan, TermDate, get_start_date
+from apps.meet_plan.schema import MeetPlanType
 from apps.user.models import User
 from apps.user.schema import UserType
 
@@ -1277,3 +1278,355 @@ class MutationApiTest(GraphQLTestCase):
         self.assertEqual(content["data"]["meetPlanCreate"]["errors"], [])
         mt = MeetPlan.objects.get(pk=content["data"]["meetPlanCreate"]["meetPlan"]["pk"])
         self.assertTrue(self.teacher.has_perms(["meet_plan.change_meetplan", "meet_plan.delete_meetplan"], mt))
+
+    def test_meet_plan_update_admin(self):
+        mt = MeetPlan.objects.create(
+            teacher=self.teacher,
+            place=self.teacher.address,
+            start_time=timezone.now(),
+            duration=1,
+        )
+        response = self.query(
+            """
+            mutation myMutation($input: MeetPlanUpdateInput!){
+              meetPlanUpdate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "startTime": timezone.now().isoformat(),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.admin),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+    def test_meet_plan_update_teacher(self):
+        mt = MeetPlan.objects.create(
+            teacher=self.teacher,
+            place=self.teacher.address,
+            start_time=timezone.now(),
+            duration=1,
+        )
+        assign_perm("meet_plan.change_meetplan", self.teacher, mt)
+        teacher = User.objects.create(
+            pku_id="2000000002",
+            name="teacher2",
+            email="teacher2@pku.edu.cn",
+            address="teacher2 office",
+            is_teacher=True,
+        )
+
+        query_str = """
+            mutation myMutation($input: MeetPlanUpdateInput!){
+              meetPlanUpdate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "startTime": timezone.now().isoformat(),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+                "complete": True,
+            },
+            headers=self.get_headers(self.teacher),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "teacher": to_global_id(UserType._meta.name, str(teacher.id)),
+                "startTime": timezone.now().isoformat(),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+                "complete": True,
+            },
+            headers=self.get_headers(self.teacher),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "startTime": timezone.now().isoformat(),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+                "complete": True,
+            },
+            headers=self.get_headers(teacher),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+    def test_meet_plan_update_student(self):
+        mt = MeetPlan.objects.create(
+            teacher=self.teacher,
+            place=self.teacher.address,
+            start_time=timezone.now() + timedelta(hours=1),
+            duration=1,
+        )
+        student = User.objects.create(
+            pku_id="2000000002",
+            name="student2",
+            email="student2@pku.edu.cn",
+        )
+
+        query_str = """
+            mutation myMutation($input: MeetPlanUpdateInput!){
+              meetPlanUpdate(input: $input){
+                errors {
+                  field
+                  message
+                }
+                clientMutationId
+                meetPlan{
+                  id
+                  pk
+                  teacher {
+                    id
+                    name
+                  }
+                  place
+                  startTime
+                  duration
+                  tMessage
+                  available
+                  student {
+                    id
+                    name
+                  }
+                  sMessage
+                  complete
+                }
+              }
+            }
+            """
+
+        # 安排未被选取时的测试逻辑
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "teacher": to_global_id(UserType._meta.name, str(student.id)),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "startTime": timezone.now().isoformat(),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "place": self.student.address,
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "duration": 2,
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "tMessage": "test hhhh",
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        mt.start_time = timezone.now()
+        mt.save()
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        mt.start_time = timezone.now() + timedelta(hours=1)
+        mt.student = self.student
+        mt.save()
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "student": to_global_id(UserType._meta.name, str(student.id)),
+                "sMessage": "test hhh",
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "student": None,
+                "sMessage": "test hhh",
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id)), "sMessage": "test hhh"},
+            headers=self.get_headers(student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id)), "complete": True},
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertNotEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        mt.student = None
+        mt.save()
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlanUpdate"]["errors"], [])
+
+        response = self.query(
+            query_str,
+            input_data={
+                "id": to_global_id(MeetPlanType._meta.name, str(mt.id)),
+                "student": to_global_id(UserType._meta.name, str(self.student.id)),
+                "sMessage": "test",
+            },
+            headers=self.get_headers(self.student),
+        )
+        content = json.loads(response.content)
+        self.assertResponseNoErrors(response)
+        self.assertEqual(content["data"]["meetPlanUpdate"]["errors"], [])
