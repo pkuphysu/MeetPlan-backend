@@ -68,7 +68,7 @@ python-versions = "*"
 
 [[package]]
 name = "black"
-version = "21.4b2"
+version = "21.5b0"
 description = "The uncompromising code formatter."
 category = "dev"
 optional = false
@@ -775,7 +775,7 @@ pgsql = ["psycopg2"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "eaef98d42f3e4ea0a0fa2fe4d5b22911f03ec2b10c36ff603c496291e9b42852"
+content-hash = "e2773035d74708bbc144f912fa22724bc469161a6c97e868212b2528578233c9"
 
 [metadata.files]
 amqp = [
@@ -807,8 +807,8 @@ billiard = [
     {file = "billiard-3.6.4.0.tar.gz", hash = "sha256:299de5a8da28a783d51b197d496bef4f1595dd023a93a4f59dde1886ae905547"},
 ]
 black = [
-    {file = "black-21.4b2-py3-none-any.whl", hash = "sha256:bff7067d8bc25eb21dcfdbc8c72f2baafd9ec6de4663241a52fb904b304d391f"},
-    {file = "black-21.4b2.tar.gz", hash = "sha256:fc9bcf3b482b05c1f35f6a882c079dc01b9c7795827532f4cc43c0ec88067bbc"},
+    {file = "black-21.5b0-py3-none-any.whl", hash = "sha256:0e80435b8a88f383c9149ae89d671eb2095b72344b0fe8a1d61d2ff5110ed173"},
+    {file = "black-21.5b0.tar.gz", hash = "sha256:9dc2042018ca10735366d944c2c12d9cad6dec74a3d5f679d09384ea185d9943"},
 ]
 celery = [
     {file = "celery-5.0.5-py3-none-any.whl", hash = "sha256:5e8d364e058554e83bbb116e8377d90c79be254785f357cb2cec026e79febe13"},
