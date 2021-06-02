@@ -1344,7 +1344,9 @@ class MutationApiTest(GraphQLTestCase):
                 "clientMutationId": "without token",
             },
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["me"]["errors"]), 0)
 
     def test_me(self):
         department = Department.objects.create(department="test")
@@ -1462,7 +1464,9 @@ class MutationApiTest(GraphQLTestCase):
             """,
             input_data={"clientMutationId": "without token", "email": "test@pku.edu.cn", "pkuId": "2000000001"},
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["userCreate"]["errors"]), 0)
 
     def test_user_create(self):
         self.user.is_admin = True
@@ -1567,7 +1571,9 @@ class MutationApiTest(GraphQLTestCase):
                 "pkuId": "2000000001",
             },
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["userUpdate"]["errors"]), 0)
 
     def test_user_update(self):
         self.user.is_admin = True
@@ -1669,7 +1675,9 @@ class MutationApiTest(GraphQLTestCase):
                 "id": to_global_id(UserType._meta.name, str(user.id)),
             },
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["userDelete"]["errors"]), 0)
 
     def test_user_delete(self):
         self.user.is_admin = True
@@ -1814,7 +1822,9 @@ class MutationApiTest(GraphQLTestCase):
                 "department": "m test",
             },
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["departmentUpdate"]["errors"]), 0)
 
     def test_department_update(self):
         assign_perm("user.change_department", self.user)
@@ -1878,7 +1888,9 @@ class MutationApiTest(GraphQLTestCase):
                 "id": to_global_id(DepartmentType._meta.name, str(department.id)),
             },
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["departmentDelete"]["errors"]), 0)
 
     def test_department_delete(self):
         assign_perm("user.delete_department", self.user)

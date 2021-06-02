@@ -878,7 +878,9 @@ class MutationApiTest(GraphQLTestCase):
             """,
             input_data={"clientMutationId": "without token", "startDate": now.isoformat()},
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["termDateUpdate"]["errors"]), 0)
 
         response = self.query(
             """
@@ -1677,7 +1679,9 @@ class MutationApiTest(GraphQLTestCase):
             input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
             headers=self.get_headers(self.admin),
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["meetPlanDelete"]["errors"]), 0)
         self.assertEqual(MeetPlan.objects.all().count(), 1)
 
         mt.student = None
@@ -1739,7 +1743,9 @@ class MutationApiTest(GraphQLTestCase):
             input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
             headers=self.get_headers(self.teacher),
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["meetPlanDelete"]["errors"]), 0)
         self.assertEqual(MeetPlan.objects.all().count(), 1)
 
         mt.student = None
@@ -1750,7 +1756,9 @@ class MutationApiTest(GraphQLTestCase):
             input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
             headers=self.get_headers(self.teacher),
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["meetPlanDelete"]["errors"]), 0)
         self.assertEqual(MeetPlan.objects.all().count(), 1)
 
         assign_perm("meet_plan.delete_meetplan", self.teacher, mt)
@@ -1808,5 +1816,7 @@ class MutationApiTest(GraphQLTestCase):
             input_data={"id": to_global_id(MeetPlanType._meta.name, str(mt.id))},
             headers=self.get_headers(self.student),
         )
-        self.assertResponseHasErrors(response)
+        self.assertResponseNoErrors(response)
+        content = json.loads(response.content)
+        self.assertGreater(len(content["data"]["meetPlanDelete"]["errors"]), 0)
         self.assertEqual(MeetPlan.objects.all().count(), 1)
