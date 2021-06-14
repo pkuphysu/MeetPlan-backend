@@ -9,7 +9,6 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -35,9 +34,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "graphene_django",
     "django_filters",
-    "graphql_jwt.refresh_token",
     "guardian",
     "apps.user",
     "apps.pku_auth",
@@ -154,50 +151,20 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-# the schema location for Graphene
-# https://docs.graphene-python.org/projects/django/en/latest/installation/
-GRAPHENE = {
-    "SCHEMA": "MeetPlan.schema.schema",
-    "ATOMIC_MUTATIONS": True,
-    "MIDDLEWARE": [
-        "graphql_jwt.middleware.JSONWebTokenMiddleware",
-    ],
-}
-if DEBUG:
-    GRAPHENE["MIDDLEWARE"].append("graphene_django.debug.DjangoDebugMiddleware")
-
 AUTH_USER_MODEL = "user.User"
 
 AUTHENTICATION_BACKENDS = [
     "apps.pku_auth.backends.OpenIDClientBackend",
-    "graphql_jwt.backends.JSONWebTokenBackend",
     "guardian.backends.ObjectPermissionBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
-
-GRAPHQL_JWT = {
-    "JWT_VERIFY_EXPIRATION": True,
-    "JWT_LONG_RUNNING_REFRESH_TOKEN": True,
-    "JWT_REUSE_REFRESH_TOKENS": True,
-    "JWT_EXPIRATION_DELTA": timedelta(hours=1),
-    "JWT_REFRESH_EXPIRATION_DELTA": timedelta(days=7),
-    "JWT_ALLOW_ANY_CLASSES": [
-        "apps.pku_auth.schema.ObtainJSONWebToken",
-        "apps.pku_auth.schema.Verify",
-        "apps.pku_auth.schema.Refresh",
-        "apps.pku_auth.schema.Revoke",
-        "apps.pku_auth.schema.RevokeAll",
-    ],
-}
-
-GRAPHENE_DJANGO_PLUS = {"MUTATIONS_INCLUDE_REVERSE_RELATIONS": False}
 
 # Django Guardian
 # https://django-guardian.readthedocs.io/en/stable/configuration.html#anonymous-user-name

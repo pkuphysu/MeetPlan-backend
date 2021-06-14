@@ -5,7 +5,6 @@ from django.conf import settings
 from django.db import models
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
-from graphene_django_plus.models import GuardedModel, GuardedModelManager
 
 
 def get_start_date():
@@ -20,7 +19,7 @@ def get_start_date():
     return start_date
 
 
-class MeetPlanManager(GuardedModelManager):
+class MeetPlanManager(models.Manager):
     def get_queryset(self, start_date=None):
         if start_date is None:
             return super(MeetPlanManager, self).get_queryset()
@@ -28,8 +27,8 @@ class MeetPlanManager(GuardedModelManager):
             return super(MeetPlanManager, self).get_queryset().filter(start_time__gt=start_date)
 
 
-class MeetPlan(GuardedModel):
-    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="meet_plan")
+class MeetPlan(models.Model):
+    teacher = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="meet_plan_set")
     place = models.CharField(_("place"), max_length=100)
     start_time = models.DateTimeField(_("start time"))
     duration = models.PositiveSmallIntegerField(
@@ -39,7 +38,7 @@ class MeetPlan(GuardedModel):
     )
     t_message = models.TextField(_("teacher message"), blank=True)
     student = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="meet_plan_order", null=True, blank=True
+        settings.AUTH_USER_MODEL, on_delete=models.DO_NOTHING, related_name="meet_plan_order_set", null=True, blank=True
     )
     s_message = models.TextField(_("student message"), blank=True)
     complete = models.BooleanField(_("status"), default=False)
@@ -61,7 +60,7 @@ class MeetPlan(GuardedModel):
         super().save(kwargs)
 
 
-class TermDate(GuardedModel):
+class TermDate(models.Model):
     start_date = models.DateTimeField(_("term start date"))
 
     class Meta:

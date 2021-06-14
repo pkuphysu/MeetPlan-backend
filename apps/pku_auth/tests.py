@@ -1,15 +1,6 @@
-import json
-from datetime import timedelta
 from unittest import mock
 
-from django.test import TestCase, override_settings
-from django.utils import timezone
-from django.utils.translation import gettext_lazy as _
-from freezegun import freeze_time
-from graphene_django.utils.testing import GraphQLTestCase
-from graphql_jwt.settings import jwt_settings
-from graphql_jwt.shortcuts import get_token
-from graphql_jwt.utils import get_payload
+from django.test import TestCase
 
 from apps.pku_auth.backends import OpenIDClientBackend
 from apps.pku_auth.models import OpenIDClient
@@ -125,7 +116,7 @@ class TestBackend(OpenIDClientBackend):
         return User.objects.get(pku_id=code)
 
 
-class SignalTest(GraphQLTestCase):
+class SignalTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         cls.user = User.objects.create(pku_id="2000000000")
@@ -147,148 +138,9 @@ class SignalTest(GraphQLTestCase):
         self.assertTrue(signal.called)
         self.assertEqual(signal.call_count, 1)
 
-    @override_settings(AUTHENTICATION_BACKENDS=["apps.pku_auth.tests.TestBackend"])
-    def test_user_logged_in_signal_triggered(self):
-        response = self.query(
-            """
-            mutation myMutation($input: String!) {
-              codeAuth(code: $input) {
-                token
-                user {
-                  lastLogin
-                }
-                refreshToken
-              }
-            }
-            """,
-            operation_name="myMutation",
-            variables={"input": "2000000000"},
-        )
-        content = json.loads(response.content)
-        self.assertResponseNoErrors(response)
-        self.assertIsNotNone(content["data"]["codeAuth"]["user"]["lastLogin"])
-
-
-class ApiTest(GraphQLTestCase):
-    @classmethod
-    def setUpTestData(cls):
-        OpenIDClient.objects.create(
-            client_id="id1",
-            client_secret="password1",
-            authorization_endpoint="http://some.com/1",
-            token_endpoint="http://some.com/1",
-            userinfo_endpoint="http://some.com/1",
-            redirect_uri="http://localhost/1",
-            scopes="openid profile email",
-        )
-        OpenIDClient.objects.create(
-            client_id="123",
-            client_secret="password",
-            authorization_endpoint="http://some.com/",
-            token_endpoint="http://some.com/",
-            userinfo_endpoint="http://some.com/",
-            redirect_uri="http://localhost/",
-            scopes="openid profile",
-        )
-        cls.user = User.objects.create(pku_id="2000000000")
-
-    def test_openid_client(self):
-        response = self.query(
-            """
-            query{
-              openidClient{
-                id
-                clientId
-                authorizationEndpoint
-                redirectUri
-                scopes
-              }
-            }
-            """
-        )
-
-        content = json.loads(response.content)
-
-        # This validates the status code and if you get errors
-        self.assertResponseNoErrors(response)
-        self.assertIsNotNone(content["data"])
-        data = content["data"]
-        self.assertIsNotNone(data["openidClient"])
-        openid_client = data["openidClient"]
-        self.assertEqual(openid_client["clientId"], "123")
-        self.assertEqual(openid_client["authorizationEndpoint"], "http://some.com/")
-        self.assertEqual(openid_client["redirectUri"], "http://localhost/")
-        self.assertEqual(openid_client["scopes"], "openid profile")
-
-    @override_settings(AUTHENTICATION_BACKENDS=["apps.pku_auth.tests.TestBackend"])
-    def test_code_auth(self):
-        response = self.query(
-            """
-            mutation myMutation($input: String!) {
-              codeAuth(code: $input) {
-                token
-                payload
-                user {
-                  pkuId
-                }
-                refreshToken
-                refreshExpiresIn
-              }
-            }
-            """,
-            operation_name="myMutation",
-            variables={"input": "2000000000"},
-        )
-        content = json.loads(response.content)
-        self.assertResponseNoErrors(response)
-        self.assertIsNotNone(content["data"])
-        data = content["data"]
-        self.assertIsNotNone(data["codeAuth"])
-        code_auth = data["codeAuth"]
-        self.assertEqual(code_auth["payload"]["pku_id"], "2000000000")
-        self.assertEqual(code_auth["payload"], get_payload(token=code_auth["token"]))
-
-
-class ApiTestWithJWT(GraphQLTestCase):
-    @classmethod
-    def setUp(cls):
-        cls.user = User.objects.create(pku_id="2000000000")
-
-    def test_verify_token(self):
-        response = self.query(
-            """
-            mutation myMutation($token: String!) {
-              verifyToken(token: $token) {
-                payload
-              }
-            }
-            """,
-            variables={"token": get_token(self.user)},
-        )
-        content = json.loads(response.content)
-        self.assertResponseNoErrors(response)
-        self.assertIsNotNone(content["data"])
-        data = content["data"]
-        self.assertIsNotNone(data["verifyToken"])
-        verify_token = data["verifyToken"]
-        self.assertIsNotNone(verify_token["payload"])
-        payload = verify_token["payload"]
-        self.assertEqual(payload["pku_id"], self.user.pku_id)
-
-    def test_verify_token_expired(self):
-        token = get_token(self.user)
-        with freeze_time(lambda: timezone.now() + jwt_settings.JWT_EXPIRATION_DELTA + timedelta(seconds=1)):
-            response = self.query(
-                """
-                mutation myMutation($token: String!) {
-                  verifyToken(token: $token) {
-                    payload
-                  }
-                }
-                """,
-                variables={"token": token},
-            )
-            content = json.loads(response.content)
-            self.assertResponseHasErrors(response)
-            self.assertIsNone(content["data"]["verifyToken"])
-            self.assertEqual(content["errors"][0]["message"], _("Signature has expired"))
+    # @override_settings(AUTHENTICATION_BACKENDS=["apps.pku_auth.tests.TestBackend"])
+    # def test_user_logged_in_signal_triggered(self):
+    #
+    #     content = json.loads(response.content)
+    #     self.assertResponseNoErrors(response)
+    #     self.assertIsNotNone(content["data"]["codeAuth"]["user"]["lastLogin"])
