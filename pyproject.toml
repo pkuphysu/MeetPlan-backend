@@ -11,7 +11,7 @@ django-filter = "^2.4.0"
 requests = "^2.25.1"
 django-guardian = "^2.4.0"
 celery = "^5.1.0"
-django-celery-beat = "^2.2.0"
+django-celery-beat = "^2.2.1"
 django-celery-results = "^2.0.1"
 mysqlclient = {version = "^2.0.3", optional = true}
 psycopg2 = {version = "^2.8.6", optional = true}
