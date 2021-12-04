@@ -1,4 +1,7 @@
-# 北京大学物理学院本科生综合指导课后端
+# ~~北京大学物理学院本科生综合指导课重构~~
+
+由于上游 [Graphene]() 被其创始人遗弃，本项目流产
+
 [![build][build-image]][build-url]
 [![codecov][codecov-image]][codecov-url]
 
