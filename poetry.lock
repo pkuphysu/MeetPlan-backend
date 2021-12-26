@@ -276,11 +276,11 @@ sqlparse = ">=0.2.0"
 
 [[package]]
 name = "django-filter"
-version = "2.4.0"
+version = "21.1"
 description = "Django-filter is a reusable Django application for allowing users to filter querysets dynamically."
 category = "main"
 optional = false
-python-versions = ">=3.5"
+python-versions = ">=3.6"
 
 [package.dependencies]
 Django = ">=2.2"
@@ -777,7 +777,7 @@ pgsql = ["psycopg2"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "0e17613bc7b7fa9b328f05d239c071de0ecb443119ce450a950e5d80d157ddaa"
+content-hash = "2dec4973dc2019a45d063da1a80b72bcf0f26837a821e5c286c5e9211db5c9d8"
 
 [metadata.files]
 amqp = [
@@ -914,8 +914,8 @@ django-debug-toolbar = [
     {file = "django_debug_toolbar-3.2.1-py3-none-any.whl", hash = "sha256:e759e63e3fe2d3110e0e519639c166816368701eab4a47fed75d7de7018467b9"},
 ]
 django-filter = [
-    {file = "django-filter-2.4.0.tar.gz", hash = "sha256:84e9d5bb93f237e451db814ed422a3a625751cbc9968b484ecc74964a8696b06"},
-    {file = "django_filter-2.4.0-py3-none-any.whl", hash = "sha256:e00d32cebdb3d54273c48f4f878f898dced8d5dfaad009438fe61ebdf535ace1"},
+    {file = "django-filter-21.1.tar.gz", hash = "sha256:632a251fa8f1aadb4b8cceff932bb52fe2f826dd7dfe7f3eac40e5c463d6836e"},
+    {file = "django_filter-21.1-py3-none-any.whl", hash = "sha256:f4a6737a30104c98d2e2a5fb93043f36dd7978e0c7ddc92f5998e85433ea5063"},
 ]
 django-graphql-jwt = [
     {file = "django-graphql-jwt-0.3.2.tar.gz", hash = "sha256:36735d7d53dca2ec888f3587c05c412efb4a98c9a3f49f19771c5afcc959058d"},
