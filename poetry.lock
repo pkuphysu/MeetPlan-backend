@@ -515,7 +515,7 @@ testing = ["fields", "hunter", "process-tests", "six", "pytest-xdist", "virtuale
 
 [[package]]
 name = "pytest-django"
-version = "4.4.0"
+version = "4.5.2"
 description = "A Django plugin for pytest."
 category = "dev"
 optional = false
@@ -648,7 +648,7 @@ pgsql = ["psycopg2"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.9"
-content-hash = "e1b835fdd3fb017345a4db544ca311a41ea3c03453b3e2c757f30b533b2a0b99"
+content-hash = "6395aa1b370d8be93a0aafa4d7ae5c563ce8f0f0de9e5b992e3b52f90db6a673"
 
 [metadata.files]
 amqp = [
@@ -885,8 +885,8 @@ pytest-cov = [
     {file = "pytest_cov-2.12.1-py2.py3-none-any.whl", hash = "sha256:261bb9e47e65bd099c89c3edf92972865210c36813f80ede5277dceb77a4a62a"},
 ]
 pytest-django = [
-    {file = "pytest-django-4.4.0.tar.gz", hash = "sha256:b5171e3798bf7e3fc5ea7072fe87324db67a4dd9f1192b037fed4cc3c1b7f455"},
-    {file = "pytest_django-4.4.0-py3-none-any.whl", hash = "sha256:65783e78382456528bd9d79a35843adde9e6a47347b20464eb2c885cb0f1f606"},
+    {file = "pytest-django-4.5.2.tar.gz", hash = "sha256:d9076f759bb7c36939dbdd5ae6633c18edfc2902d1a69fdbefd2426b970ce6c2"},
+    {file = "pytest_django-4.5.2-py3-none-any.whl", hash = "sha256:c60834861933773109334fe5a53e83d1ef4828f2203a1d6a0fa9972f4f75ab3e"},
 ]
 python-crontab = [
     {file = "python-crontab-2.5.1.tar.gz", hash = "sha256:4bbe7e720753a132ca4ca9d4094915f40e9d9dc8a807a4564007651018ce8c31"},
